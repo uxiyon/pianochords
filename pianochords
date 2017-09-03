@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 # ################################################################
-# (c) Alain Cherpin - alain.cherpin@gmail.com
+# (c) Alain Cherpin - uxiyon@gmail.com
 #
 # given a sequence of music notes, draw a piano keyboard
 # with marks on the corresponding keys and return the name
