@@ -518,7 +518,7 @@ with redirect_stdout(OUTPUT):
 
 # export svg to png bitmap
 if export:
-    subprocess.call("/usr/bin/inkscape -f {} -e {} >/dev/null".format(svg_name, export_fname), shell=True)
+    subprocess.call("/usr/bin/inkscape -D -f {} -e {} >/dev/null".format(svg_name, export_fname), shell=True)
     #subprocess.call("/bin/rm -f {}".format(svg_name), shell=True)
 
 sys.exit(0)
