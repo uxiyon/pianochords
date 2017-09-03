@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python
 
 '''################################################################
 (c) Alain Cherpin - alain.cherpin@gmail.com
@@ -22,8 +22,8 @@ if nothing is given, then only draw a 2 octaves keyboard
 
 requirements:
  linux like OS
- python3+
- inkscape 0.92+
+ python2+
+ inkscape 0.92+ (export function)
 ##################################################################'''
 
 ##################################################################
@@ -35,10 +35,15 @@ requirements:
 ##################################################################
 
 ## module import
+
+# required to use print(string, file=sys.stdout) in python 2
+from __future__ import print_function
+
 import sys, subprocess
 from collections import namedtuple
 from optparse import OptionParser
-from contextlib import redirect_stdout
+
+#from contextlib import redirect_stdout
 
 ## constants
 WTE_WIDTH = 10
@@ -252,7 +257,13 @@ def svg_open():
     vbox_heigth = 30 + height_title
     width = 141
     height = 40 + height_title + height_printkey
-    print(svg_header.format(vbox_x, vbox_x, vbox_width, vbox_heigth, width, height))
+    print(svg_header.format(vbox_x,
+                            vbox_x,
+                            vbox_width,
+                            vbox_heigth,
+                            width,
+                            height),
+                            file=OUTPUT)
 
 ###############################################
 # print svg group open
@@ -267,17 +278,20 @@ def svg_g_open(cho_name):
     transform="translate({},{})"
     id="chord{}">'''
 
-    print(svg_group.format(x_translate, y_translate, cho_name))
+    print(svg_group.format(x_translate,
+                           y_translate,
+                           cho_name),
+                           file=OUTPUT)
 
 ###############################################
 # print svg group end
 def svg_g_close():
-    print("  </g>")
+    print("  </g>", file=OUTPUT)
 
 ###############################################
 # print svg file end
 def svg_close():
-    print("</svg>")
+    print("</svg>", file=OUTPUT)
 
 ###############################################
 # draw the given key as svg rectangle
@@ -297,7 +311,8 @@ def svg_draw_key(octave_shift, key):
                          key.type.dim.height,
                          x,
                          y,
-                         key.type.app.color))
+                         key.type.app.color),
+                         file=OUTPUT)
 
 ##############################################
 # draw a mark on the given note as svg circle
@@ -317,7 +332,8 @@ def svg_draw_mark(octave_shift, key):
                           r_value,
                           cx,
                           cy,
-                          key.type.mark.color))
+                          key.type.mark.color),
+                          file=OUTPUT)
 
 ###############################################
 def svg_draw_keyname(octave_shift, key):
@@ -332,7 +348,12 @@ def svg_draw_keyname(octave_shift, key):
      xml:space="preserve"><tspan
        id="tspan_{}">{}</tspan>
   </text>'''
-    print(keyname.format(key.name.title(), y, x, key.name.title(), key.name.title()))
+    print(keyname.format(key.name.title(),
+                         y,
+                         x,
+                         key.name.title(),
+                         key.name.title()),
+                         file=OUTPUT)
 
 ###############################################
 # draw chord name as svg text
@@ -348,7 +369,11 @@ def svg_draw_title(label):
        id="tspanTITLE">{}</tspan>
   </text>'''
 
-    print(svg_title.format(sanitize(label), y, x, label))
+    print(svg_title.format(sanitize(label),
+                           y,
+                           x,
+                           label),
+                           file=OUTPUT)
 
 ###############################################
 # draw a 2 octaves keyboard
@@ -441,7 +466,7 @@ except NameError as e:
     Authorized note names are:
     C D E F G A B
     Accidentals are # and b
-    e.g: "C Eb G#"'''.format(str(e)))
+    e.g: "C Eb G#"'''.format(str(e)), file=sys.stderr)
     sys.exit(1)
 
 # stream mode means read input stream until EOF is reached and
@@ -513,11 +538,12 @@ if export or filename != '':
     OUTPUT = open(svg_name, 'w')
 
 # first export to svg
-with redirect_stdout(OUTPUT):
-    svg_open()
-    svg_draw_chord(chord, chord_name)
-    svg_close()
-    OUTPUT.close()
+#with redirect_stdout(OUTPUT):
+svg_open()
+svg_draw_chord(chord, chord_name)
+svg_close()
+
+OUTPUT.close()
 
 # export svg to png bitmap
 if export:
