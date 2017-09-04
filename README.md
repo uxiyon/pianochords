@@ -30,12 +30,14 @@ Basic usage is:
 ```bash
 pianochords --chord "C E G B"
 ```
-That will print an SVG file content on standart output.
+That will print an SVG file content on standart output, representing a 2 scales piano keyboard with marks on the keys of the chord notes:
+[basic.svg](examples/basic.svg)
 
 To put this output into a file, use system redirection
 ```bash
 pianochords --chord "C E G B" > C_MAJ7.svg
 ```
+This creates the file `[C_MAJ7.svg](examples/C_MAJ7.svg)`
 
 From now you can visualize the chord in a modern browser by pointing to the URL `file:///path-to-my-chord/C_MAJ7.svg`
 If you have `inkscape` installed on your system, you probably have `inkview` tool too. Both allow you to view SVG files.
@@ -47,3 +49,11 @@ If you are running Linux, you may also consider using [librsvg](https://wiki.gno
 ```bash
 rsvg-view-3 C_MAJ7.svg     # view svg file in an X window
 ```
+
+As most word processor prefer bitmap images to svg files, it is possible to export the result SVG file to PNG raster image
+```
+pianochords -e -c "C E G B"
+```
+This example produces automatically named `C-E-G-B.png` file:
+[C-E-G-B.png](examples/C-E-G-B.png)
+
