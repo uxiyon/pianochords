@@ -1,7 +1,7 @@
 # pianochords
 Drawing a piano keyboard with chord positions.
 
-![C-E-G-B.svg - no chord name - no note names](examples/C-E-G-B.svg)
+![c_maj7.png](examples/c_maj7.png)
 
 ## Motivation
 As you play keyboard by auto-learning and do not have music theory skills (you can not read scores), you may need to draw chords positions on a keyboard. Pianochords is a program to help doing that work and render as SVG and PNG.
@@ -30,12 +30,14 @@ Basic usage is:
 ```bash
 pianochords --chord "C E G B"
 ```
-That will print an SVG file content on standart output.
+That will print an SVG file content on standart output, representing a 2 scales piano keyboard with marks on the keys of the chord notes:
+[basic.svg](examples/basic.svg)
 
 To put this output into a file, use system redirection
 ```bash
 pianochords --chord "C E G B" > C_MAJ7.svg
 ```
+This creates the SVG file [C_MAJ7.svg](examples/C_MAJ7.svg)
 
 From now you can visualize the chord in a modern browser by pointing to the URL `file:///path-to-my-chord/C_MAJ7.svg`
 If you have `inkscape` installed on your system, you probably have `inkview` tool too. Both allow you to view SVG files.
@@ -47,3 +49,33 @@ If you are running Linux, you may also consider using [librsvg](https://wiki.gno
 ```bash
 rsvg-view-3 C_MAJ7.svg     # view svg file in an X window
 ```
+
+As most word processor prefer bitmap images to svg files, it is possible to export the result SVG file to PNG raster image with `-e` (`--export`) option
+```
+pianochords --export -c "C E G B"
+```
+This example produces automatically SVG (`C-E-G-B.svg`) and PNG (`C-E-G-B.png`) files:
+
+[C-E-G-B.svg](examples/C-E-G-B.svg)
+
+![C-E-G-B.png](examples/C-E-G-B.png)
+
+You may need to name the chord, you can do it with `-n` (`--chordname`) option
+```
+pianochords -c "C E G B" --chordname "Cmaj7" -f cmaj7 -e
+```
+This creates both SVG and PNG files:
+
+[cmaj7.svg](examples/cmaj7.svg)
+
+![cmaj7.png](examples/cmaj7.png)
+
+If you need notes name to appear below the keybord, then use the `-p` (`--printkey`) option
+```
+pianochords -c "C E G B" --chordname "Cmaj7" -f c_maj7 -e
+```
+This creates both SVG and PNG files:
+
+[c_maj7.svg](examples/c_maj7.svg)
+
+![c_maj7.png](examples/c_maj7.png)
