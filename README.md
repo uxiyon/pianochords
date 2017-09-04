@@ -57,6 +57,7 @@ pianochords --export -c "C E G B"
 This example produces automatically SVG (`C-E-G-B.svg`) and PNG (`C-E-G-B.png`) files:
 
 ![C-E-G-B.svg](examples/C-E-G-B.svg)
+
 ![C-E-G-B.png](examples/C-E-G-B.png)
 
 You may need to name the chord, you can do it with `-n` (`--chordname`) option
