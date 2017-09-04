@@ -56,7 +56,7 @@ pianochords --export -c "C E G B"
 ```
 This example produces automatically SVG (`C-E-G-B.svg`) and PNG (`C-E-G-B.png`) files:
 
-![C-E-G-B.svg](examples/C-E-G-B.svg)
+[C-E-G-B.svg](examples/C-E-G-B.svg)
 
 ![C-E-G-B.png](examples/C-E-G-B.png)
 
@@ -66,7 +66,7 @@ pianochords -c "C E G B" --chordname "Cmaj7" -f cmaj7 -e
 ```
 This creates both SVG and PNG files:
 
-![cmaj7.svg](examples/cmaj7.svg)
+[cmaj7.svg](examples/cmaj7.svg)
 
 ![cmaj7.png](examples/cmaj7.png)
 
@@ -76,6 +76,6 @@ pianochords -c "C E G B" --chordname "Cmaj7" -f c_maj7 -e
 ```
 This creates both SVG and PNG files:
 
-![c_maj7.svg](examples/c_maj7.svg)
+[c_maj7.svg](examples/c_maj7.svg)
 
 ![c_maj7.png](examples/c_maj7.png)
