@@ -79,3 +79,88 @@ This creates both SVG and PNG files:
 [c_maj7.svg](examples/c_maj7.svg)
 
 ![c_maj7.png](examples/c_maj7.png)
+
+You may want to prepare many chords in text file and draw them in one shot. The `-s` (`--stream`) option allows you to read chords from a file and draw one chord per row.
+
+A row must be of the form `chord;chordname` e.g: `C E G B;Cmaj7`.
+
+Say we have the file `minor-chords-1.txt` containing minor chords at root position:
+
+```
+cat examples/stream/minor-chords-1.txt 
+C Eb G;Cm
+C# E G#;C#m
+D F A;Dm
+D# Gb A#;D#m
+E G B;Em
+F Ab C;Fm
+F# A C#;F#m
+G Bb D;Gm
+G# B D#;G#m
+A C E;Am
+A# Db F;A#m
+B D F#;Bm
+```
+
+To generate the drawing of each chords, we use the following command:
+
+```
+pianochords -e -p -s < minor-chords-1.txt
+```
+
+And we obtain the following files:
+
+SVG files
+
+[examples/stream/Cm.svg](examples/stream/Cm.svg)
+
+[examples/stream/Csharpm.svg](examples/stream/Csharpm.svg)
+
+[examples/stream/Dm.svg](examples/stream/Dm.svg)
+
+[examples/stream/Dsharpm.svg](examples/stream/Dsharpm.svg)
+
+[examples/stream/Em.svg](examples/stream/Em.svg)
+
+[examples/stream/Fm.svg](examples/stream/Fm.svg)
+
+[examples/stream/Fsharpm.svg](examples/stream/Fsharpm.svg)
+
+[examples/stream/Gm.svg](examples/stream/Gm.svg)
+
+[examples/stream/Gsharpm.svg](examples/stream/Gsharpm.svg)
+
+[examples/stream/Am.svg](examples/stream/Am.svg)
+
+[examples/stream/Asharpm.svg](examples/stream/Asharpm.svg)
+
+[examples/stream/Bm.svg](examples/stream/Bm.svg)
+
+
+PNG files
+
+![examples/stream/Cm.png](examples/stream/Cm.png)
+
+![examples/stream/Csharpm.png](examples/stream/Csharpm.png)
+
+![examples/stream/Dm.png](examples/stream/Dm.png)
+
+![examples/stream/Dsharpm.png](examples/stream/Dsharpm.png)
+
+![examples/stream/Em.png](examples/stream/Em.png)
+
+![examples/stream/Fm.png](examples/stream/Fm.png)
+
+![examples/stream/Fsharpm.png](examples/stream/Fsharpm.png)
+
+![examples/stream/Gm.png](examples/stream/Gm.png)
+
+![examples/stream/Gsharpm.png](examples/stream/Gsharpm.png)
+
+![examples/stream/Am.png](examples/stream/Am.png)
+
+![examples/stream/Asharpm.png](examples/stream/Asharpm.png)
+
+![examples/stream/Bm.png](examples/stream/Bm.png)
+
+
