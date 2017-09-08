@@ -39,11 +39,9 @@ requirements:
 # required to use print(string, file=sys.stdout) in python 2
 from __future__ import print_function
 
-import sys, subprocess
+import os, sys, subprocess
 from collections import namedtuple
 from optparse import OptionParser
-
-#from contextlib import redirect_stdout
 
 ## constants
 WTE_WIDTH = 10
@@ -71,6 +69,9 @@ SVG_ID = "chords"
 HEIGHT_TITLE = 20
 HEIGHT_PRINTKEY = 15
 CHORD_Y_SHIFT = 20
+
+EXPORT_CMD_NAME = "inkscape"
+export_cmd = ''
 
 ## variables fed from arguments
 chord = []
@@ -106,33 +107,47 @@ blk_mark = KeyMark(BLK_MARK_COLOR, BLK_MARK_V_OFFSET)
 black = KeyType(BLK_INIT_OFFSET, blk_dim, blk_app, blk_mark)
 
 # define all 12 notes
+C_sflat  = Key('Cbb', 11, 5, 1, black)
 C_flat  = Key('Cb', 12, 6, 0, white)
 C       = Key('C', 1, 0, 0, white)
 C_sharp = Key('C#', 2, 0, -1, black)
+C_ssharp = Key('Cx', 3, 1, 0, white)
 
+D_sflat  = Key('Dbb', 1, 0, 1, white)
 D_flat  = Key('Db', 2, 0, -1, black)
 D       = Key('D', 3, 1, 0, white)
 D_sharp = Key('D#', 4, 1, 1, black)
+D_ssharp = Key('Dx', 5, 2, 0, white)
 
+E_sflat  = Key('Ebb', 3, 1, 0, white)
 E_flat  = Key('Eb', 4, 1, 1, black)
 E       = Key('E', 5, 2, 0, white)
 E_sharp = Key('E#', 6, 3, 0, white)
+E_ssharp = Key('Ex', 7, 3, -1, black)
 
+F_sflat  = Key('Fbb', 4, 1, 1, black)
 F_flat  = Key('Fb', 5, 2, 0, white)
 F       = Key('F', 6, 3, 0, white)
 F_sharp = Key('F#', 7, 3, -1, black)
+F_ssharp = Key('Fx', 8, 4, 0, white)
 
+G_sflat  = Key('Gbb', 6, 3, 0, white)
 G_flat  = Key('Gb', 7, 3, -1, black)
 G       = Key('G', 8, 4, 0, white)
 G_sharp = Key('G#', 9, 4, 0, black)
+G_ssharp = Key('Gx', 10, 5, 0, white)
 
+A_sflat  = Key('Abb', 8, 4, 0, white)
 A_flat  = Key('Ab', 9, 4, 0, black)
 A       = Key('A', 10, 5, 0, white)
 A_sharp = Key('A#', 11, 5, 1, black)
+A_ssharp = Key('Ax', 12, 6, 0, white)
 
+B_sflat  = Key('Bbb', 10, 5, 0, white)
 B_flat  = Key('Bb', 11, 5, 1, black)
 B       = Key('B', 12, 6, 0, white)
 B_sharp = Key('B#', 1, 0, 0, white)
+B_ssharp = Key('Bx', 2, 0, -1, black)
 
 # all 12 notes ordered to be drawn in svg
 # the order is important for the black to overlap whites
@@ -143,31 +158,13 @@ TWELVE = [C, D, E, F, G, A, B, B_sharp, C_sharp, D_sharp, E_sharp, F_sharp, G_sh
 
 ALL_NOTES = [C, D, E, F, G, A, B,
              C_sharp, D_sharp, E_sharp, F_sharp, G_sharp, A_sharp, B_sharp,
-             C_flat, D_flat, E_flat, F_flat, G_flat, A_flat, B_flat]
+             C_flat, D_flat, E_flat, F_flat, G_flat, A_flat, B_flat,
+             C_sflat, D_sflat, E_sflat, F_sflat, G_sflat, A_sflat, B_sflat,
+             C_ssharp, D_ssharp, E_ssharp, F_ssharp, G_ssharp, A_ssharp, B_ssharp]
 
-## known chords
-#MAJOR_C = "C E G"
-#MAJOR_C1 = "E G C"
-#MAJOR_C2 = "G C E"
-#
-#major = [0, 4, 7]
-#ref = C
-#
-#print(OCTAVE[r].name)
-#print(OCTAVE[r+4].name)
-#print(OCTAVE[r+7].name)
-#
-#def name_chord(note_serie):
-#    lst = note_serie.split()
-#    for n in lst:
-#        
-#
-#
-#sys.exit(99)
 
 ###############################################
 # functions
-
 ###############################################
 def usage():
     print("Usage: TODO")
@@ -219,6 +216,18 @@ def args():
 
     # activate stream mode
     stream_mode = options.stream 
+
+
+
+###############################################
+# check if cmd exists and is executable on OS
+# return command full name on success
+# or empty string on failed search
+def cmd_fullname(cmd):
+    for path in os.environ["PATH"].split(os.pathsep):
+        if os.access(os.path.join(path, cmd), os.X_OK):
+            return os.path.join(path, cmd)
+    return ''
 
 ###############################################
 # print begining of svg file
@@ -517,6 +526,8 @@ if filename != '':
 
 # export to png
 if export:
+    export_cmd = cmd_fullname(EXPORT_CMD_NAME)
+
     ext = ".png"
     export_fname = set_extension(TMP_FILENAME, ext)
     if filename != '':
@@ -538,7 +549,6 @@ if export or filename != '':
     OUTPUT = open(svg_name, 'w')
 
 # first export to svg
-#with redirect_stdout(OUTPUT):
 svg_open()
 svg_draw_chord(chord, chord_name)
 svg_close()
@@ -547,7 +557,9 @@ OUTPUT.close()
 
 # export svg to png bitmap
 if export:
-    subprocess.call("/usr/bin/inkscape -D -f {} -e {} >/dev/null".format(svg_name, export_fname), shell=True)
-    #subprocess.call("/bin/rm -f {}".format(svg_name), shell=True)
+    if export_cmd != '':
+        subprocess.call(export_cmd + " -D -f {} -e {} >/dev/null".format(svg_name, export_fname), shell=True)
+    else:
+        print("Export command not found: " + EXPORT_CMD_NAME, file=sys.stderr)
 
 sys.exit(0)
