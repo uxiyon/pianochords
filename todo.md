@@ -1,8 +1,7 @@
 # Todo list
 
-- [x] Improve chord input syntax to support double sharp (bb), needed to represent a Cdim7 for instance: `C Eb Gb Bbb`
-- [x] Do similar improvements to support input double sharp (x)
-- [x] check if pianochords is usable, i.e. environment fits the needs
-- [x] replace ugly `/usr/bin/inkscape` by a more pythonic way to call external program, at least check if present
 - [ ] if inkscape is not available, then check if rsvg present, if none present, then send error message on stdout only in case of `--export` use
-
+- [ ] provide a zoom option expressed in percent with `--export`, for instance `--export 250%`
+- [ ] reorganize data structure to use note names as array keys
+- [ ] offer another way inputing chords: `--realname`, for instance `--realname "Cdim7"` for a C diminished seventh that is auto-calculated
+- [ ] offer a `--inversion` option to choose simple inversion (0,1,2,3) with `--realname` option: for instance `--inversion 0` for root position, `--inversion 2` for second inversion
