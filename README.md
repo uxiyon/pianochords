@@ -87,18 +87,23 @@ A row must be of the form `chord;chordname` e.g: `C E G B;Cmaj7`.
 Say we have the file `minor-chords-1.txt` containing minor chords at root position:
 
 ```
-cat examples/stream/minor-chords-1.txt 
+cat examples/stream/minor-chords-1.txt
 C Eb G;Cm
 C# E G#;C#m
+Db E Ab;Dbm
 D F A;Dm
-D# Gb A#;D#m
+D# F# A#;D#m
+Eb Gb Bb;Ebm
 E G B;Em
 F Ab C;Fm
 F# A C#;F#m
+Gb A Db;Gbm
 G Bb D;Gm
 G# B D#;G#m
+Ab B Eb;Abm
 A C E;Am
-A# Db F;A#m
+A# C# F;A#m
+Bb Db F;Bbm
 B D F#;Bm
 ```
 
@@ -112,55 +117,55 @@ And we obtain the following files:
 
 SVG files
 
-[examples/stream/Cm.svg](examples/stream/Cm.svg)
+[examples/stream/minor/Cm.svg](examples/stream/minor/Cm.svg)
 
-[examples/stream/Csharpm.svg](examples/stream/Csharpm.svg)
+[examples/stream/minor/Csharpm.svg](examples/stream/minor/Csharpm.svg)
 
-[examples/stream/Dm.svg](examples/stream/Dm.svg)
+[examples/stream/minor/Dm.svg](examples/stream/minor/Dm.svg)
 
-[examples/stream/Dsharpm.svg](examples/stream/Dsharpm.svg)
+[examples/stream/minor/Dsharpm.svg](examples/stream/minor/Dsharpm.svg)
 
-[examples/stream/Em.svg](examples/stream/Em.svg)
+[examples/stream/minor/Em.svg](examples/stream/minor/Em.svg)
 
-[examples/stream/Fm.svg](examples/stream/Fm.svg)
+[examples/stream/minor/Fm.svg](examples/stream/minor/Fm.svg)
 
-[examples/stream/Fsharpm.svg](examples/stream/Fsharpm.svg)
+[examples/stream/minor/Fsharpm.svg](examples/stream/minor/Fsharpm.svg)
 
-[examples/stream/Gm.svg](examples/stream/Gm.svg)
+[examples/stream/minor/Gm.svg](examples/stream/minor/Gm.svg)
 
-[examples/stream/Gsharpm.svg](examples/stream/Gsharpm.svg)
+[examples/stream/minor/Gsharpm.svg](examples/stream/minor/Gsharpm.svg)
 
-[examples/stream/Am.svg](examples/stream/Am.svg)
+[examples/stream/minor/Am.svg](examples/stream/minor/Am.svg)
 
-[examples/stream/Asharpm.svg](examples/stream/Asharpm.svg)
+[examples/stream/minor/Asharpm.svg](examples/stream/minor/Asharpm.svg)
 
-[examples/stream/Bm.svg](examples/stream/Bm.svg)
+[examples/stream/minor/Bm.svg](examples/stream/minor/Bm.svg)
 
 
 PNG files
 
-![examples/stream/Cm.png](examples/stream/Cm.png)
+![examples/stream/minor/Cm.png](examples/stream/minor/Cm.png)
 
-![examples/stream/Csharpm.png](examples/stream/Csharpm.png)
+![examples/stream/minor/Csharpm.png](examples/stream/minor/Csharpm.png)
 
-![examples/stream/Dm.png](examples/stream/Dm.png)
+![examples/stream/minor/Dm.png](examples/stream/minor/Dm.png)
 
-![examples/stream/Dsharpm.png](examples/stream/Dsharpm.png)
+![examples/stream/minor/Dsharpm.png](examples/stream/minor/Dsharpm.png)
 
-![examples/stream/Em.png](examples/stream/Em.png)
+![examples/stream/minor/Em.png](examples/stream/minor/Em.png)
 
-![examples/stream/Fm.png](examples/stream/Fm.png)
+![examples/stream/minor/Fm.png](examples/stream/minor/Fm.png)
 
-![examples/stream/Fsharpm.png](examples/stream/Fsharpm.png)
+![examples/stream/minor/Fsharpm.png](examples/stream/minor/Fsharpm.png)
 
-![examples/stream/Gm.png](examples/stream/Gm.png)
+![examples/stream/minor/Gm.png](examples/stream/minor/Gm.png)
 
-![examples/stream/Gsharpm.png](examples/stream/Gsharpm.png)
+![examples/stream/minor/Gsharpm.png](examples/stream/minor/Gsharpm.png)
 
-![examples/stream/Am.png](examples/stream/Am.png)
+![examples/stream/minor/Am.png](examples/stream/minor/Am.png)
 
-![examples/stream/Asharpm.png](examples/stream/Asharpm.png)
+![examples/stream/minor/Asharpm.png](examples/stream/minor/Asharpm.png)
 
-![examples/stream/Bm.png](examples/stream/Bm.png)
+![examples/stream/minor/Bm.png](examples/stream/minor/Bm.png)
 
 

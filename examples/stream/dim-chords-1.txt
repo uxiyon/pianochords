@@ -1,0 +1,17 @@
+C Eb Gb;Cdim
+C# E G;C#dim
+Db E A;Dbdim
+D F Ab;Ddim
+D# F# A;D#dim
+Eb Gb A;Ebdim
+E G Bb;Edim
+F Ab B;Fdim
+F# A C;F#dim
+Gb A D;Gbdim
+G Bb Db;Gdim
+G# B D;G#dim
+Ab B D;Abdim
+A C Eb;Adim
+A# C# E;A#dim
+Bb Db E;Bbdim
+B D F;Bdim
