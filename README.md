@@ -87,18 +87,23 @@ A row must be of the form `chord;chordname` e.g: `C E G B;Cmaj7`.
 Say we have the file `minor-chords-1.txt` containing minor chords at root position:
 
 ```
-cat examples/stream/minor-chords-1.txt 
+cat examples/stream/minor-chords-1.txt
 C Eb G;Cm
 C# E G#;C#m
+Db E Ab;Dbm
 D F A;Dm
-D# Gb A#;D#m
+D# F# A#;D#m
+Eb Gb Bb;Ebm
 E G B;Em
 F Ab C;Fm
 F# A C#;F#m
+Gb A Db;Gbm
 G Bb D;Gm
 G# B D#;G#m
+Ab B Eb;Abm
 A C E;Am
-A# Db F;A#m
+A# C# F;A#m
+Bb Db F;Bbm
 B D F#;Bm
 ```
 
