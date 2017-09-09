@@ -51,7 +51,8 @@ WTE_COLOR = "#ffffff"
 WTE_OPACITY = 1
 WTE_TYPE = 0
 WTE_MARK_V_OFFSET = (3.2 * WTE_WIDTH)
-WTE_MARK_COLOR = "#00c000"
+#WTE_MARK_COLOR = "#00c000"
+WTE_MARK_COLOR = "#000000"
 
 BLK_SHIFT = 1     # specific black key shift value
 BLK_WIDTH = 6
@@ -61,7 +62,9 @@ BLK_COLOR = "#000000"
 BLK_OPACITY = 1
 BLK_TYPE = 1
 BLK_MARK_V_OFFSET = (2.7 * BLK_WIDTH)
-BLK_MARK_COLOR = "#00c000"
+#BLK_MARK_COLOR = "#00c000"
+BLK_MARK_COLOR = "#ffffff"
+
 
 OUTPUT = sys.stdout
 TMP_FILENAME = "new_chord"
@@ -69,6 +72,7 @@ SVG_ID = "chords"
 HEIGHT_TITLE = 20
 HEIGHT_PRINTKEY = 15
 CHORD_Y_SHIFT = 20
+MARK_RADIUS = 3
 
 EXPORT_CMD_NAME = "inkscape"
 export_cmd = ''
@@ -265,7 +269,7 @@ def svg_open():
     vbox_width = 141
     vbox_heigth = 30 + height_title
     width = 141
-    height = 40 + height_title + height_printkey
+    height = 42 + height_title + height_printkey
     print(svg_header.format(vbox_x,
                             vbox_x,
                             vbox_width,
@@ -313,7 +317,7 @@ def svg_draw_key(octave_shift, key):
     height="{}"
     x="{}"
     y="{}"
-    style="fill:{};fill-opacity:1;stroke:#000000;stroke-width:0.26458332;stroke-opacity:1"
+    style="fill:{};fill-opacity:1;stroke:#000000;stroke-width:1;stroke-opacity:1"
     />'''
     print(svg_key.format(key.index,
                          key.type.dim.width,
@@ -326,7 +330,8 @@ def svg_draw_key(octave_shift, key):
 ##############################################
 # draw a mark on the given note as svg circle
 def svg_draw_mark(octave_shift, key):
-    r_value = 2.7807205
+    #r_value = 2.7807205
+    r_value = MARK_RADIUS
     cx=(octave_shift + (key.h_offset * WTE_WIDTH + (WTE_WIDTH / 2)) + key.type.h_init_offset * 0.7 )
     cy=key.type.mark.v_offset
     svg_mark = '''  <circle
@@ -353,7 +358,7 @@ def svg_draw_keyname(octave_shift, key):
      id="key_{}"
      y="{}"
      x="{}"
-     style="font-style:normal;font-weight:normal;font-size:6px;line-height:1.25;font-family:monospace;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+     style="font-style:normal;font-weight:bold;font-size:6px;line-height:1.25;font-family:monospace;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
      xml:space="preserve"><tspan
        id="tspan_{}">{}</tspan>
   </text>'''
@@ -373,7 +378,7 @@ def svg_draw_title(label):
      id="title_{}"
      y="{}"
      x="{}"
-     style="font-style:normal;font-weight:normal;font-size:10px;line-height:1.25;font-family:monospace;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+     style="font-style:normal;font-weight:bold;font-size:14px;line-height:1.25;font-family:monospace;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
      xml:space="preserve"><tspan
        id="tspanTITLE">{}</tspan>
   </text>'''
