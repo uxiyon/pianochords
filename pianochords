@@ -74,7 +74,9 @@ HEIGHT_PRINTKEY = 15
 CHORD_Y_SHIFT = 20
 MARK_RADIUS = 3
 
-EXPORT_CMD_NAME = "inkscape"
+EXPORT_CMD = {'inkscape': ' -D -f {} -e {} >/dev/null',
+              'rsvg-convert': ' {} -o {} -a >/dev/null'}
+
 export_cmd = ''
 
 ## variables fed from arguments
@@ -227,10 +229,27 @@ def args():
 # check if cmd exists and is executable on OS
 # return command full name on success
 # or empty string on failed search
-def cmd_fullname(cmd):
+def export_cmd_fullname(cmd):
     for path in os.environ["PATH"].split(os.pathsep):
         if os.access(os.path.join(path, cmd), os.X_OK):
             return os.path.join(path, cmd)
+    return ''
+
+###############################################
+# return full shell svg to png command
+# expression made out of EXPORT_CMD dictionary
+# content
+# return an empty string if none commands are
+# found on the OS
+def export_cmd_expr():
+    cmds = EXPORT_CMD.keys()
+    cmds.sort()
+    for cmd in cmds:
+        cmd_name = export_cmd_fullname(cmd)
+        if not cmd_name:
+            continue
+        return cmd + EXPORT_CMD[cmd]
+
     return ''
 
 ###############################################
@@ -531,7 +550,9 @@ if filename != '':
 
 # export to png
 if export:
-    export_cmd = cmd_fullname(EXPORT_CMD_NAME)
+    # export_cmd is a full svg to png shell command expression
+    # made from EXPORT_CMD content
+    export_cmd = export_cmd_expr()
 
     ext = ".png"
     export_fname = set_extension(TMP_FILENAME, ext)
@@ -563,8 +584,11 @@ OUTPUT.close()
 # export svg to png bitmap
 if export:
     if export_cmd != '':
-        subprocess.call(export_cmd + " -D -f {} -e {} >/dev/null".format(svg_name, export_fname), shell=True)
+        # export_cmd expression must contain exactely 2 pairs of empty
+        # braces ...{}...{}... to be filled with svg_name and export_fname
+        subprocess.call(export_cmd.format(svg_name, export_fname), shell=True)
     else:
-        print("Export command not found: " + EXPORT_CMD_NAME, file=sys.stderr)
+        print("No export command found in " + str(EXPORT_CMD.keys()),
+              file=sys.stderr)
 
 sys.exit(0)
