@@ -1,16 +1,16 @@
-# pianochords
+# printchord
 Drawing a piano keyboard with chord positions.
 
 ![cdim7.png](examples/cdim7.png)
 
 ## Motivation
-As you play keyboard by auto-learning and do not have music theory skills (you can not read scores), you may need to draw chords positions on a keyboard to memorise them. Pianochords is a program to help doing that work and renders chord drawings as SVG and PNG files.
+As you play keyboard by auto-learning and do not have music theory skills (you can not read scores), you may need to draw chords positions on a keyboard to memorise them. Printchord is a program to help doing that work and renders chord drawings as SVG and PNG files.
 As I was talking to a friend of chord positions, I could not find any program to help me generate theses little piano chords pictures, so I wrote it to compose [this document](examples/triads.pdf).
-I hope pianochords could be useful to others. Please let me know if you use it :-)
+I hope printchord could be useful to others. Please let me know if you use it :-)
 
 ## Development
-Pianochords is developed with python as a language learning exercise.
-My goal is first to make pianochords a usable tool in Linux CLI point of view. The idea behind it is to be able to automate piano chord drawings from few information: the notes of the chord.
+Printchord is developed with python as a language learning exercise.
+My goal is first to make printchord a usable tool in Linux CLI point of view. The idea behind it is to be able to automate piano chord drawings from few information: the notes of the chord.
 
 ### Depencies
 1. Python modules
@@ -40,14 +40,14 @@ My goal is first to make pianochords a usable tool in Linux CLI point of view. T
 
 Basic usage is:
 ```bash
-pianochords --chord "C E G B"
+printchord --chord "C E G B"
 ```
 That will print an SVG file content on standart output, representing a 2 scales piano keyboard with marks on the keys of the chord notes:
 [basic.svg](examples/basic.svg)
 
 To put this output into a file, use system redirection
 ```bash
-pianochords --chord "C E G B" > c_maj7.svg
+printchord --chord "C E G B" > c_maj7.svg
 ```
 This creates the SVG file [c_maj.svg](examples/c_maj7.svg)
 
@@ -64,7 +64,7 @@ rsvg-view-3 c_maj7.svg     # view svg file in an X window
 
 As most word processor prefer bitmap images to svg files, it is possible to export the result SVG file to PNG raster image with `-e` (`--export`) option
 ```
-pianochords --export -c "C E G B"
+printchord --export -c "C E G B"
 ```
 This example produces automatically SVG (`C-E-G-B.svg`) and PNG (`C-E-G-B.png`) files:
 
@@ -74,7 +74,7 @@ This example produces automatically SVG (`C-E-G-B.svg`) and PNG (`C-E-G-B.png`) 
 
 You may need to name the chord, you can do it with `-n` (`--chordname`) option
 ```
-pianochords -c "C E G B" --chordname "Cmaj7" -f cmaj7 -e
+printchord -c "C E G B" --chordname "Cmaj7" -f cmaj7 -e
 ```
 This creates both SVG and PNG files:
 
@@ -84,7 +84,7 @@ This creates both SVG and PNG files:
 
 If you need notes name to appear below the keybord, then use the `-p` (`--printkey`) option
 ```
-pianochords -c "C E G B" --chordname "Cmaj7" -f c_maj7 -e
+printchord -c "C E G B" --chordname "Cmaj7" -f c_maj7 -e
 ```
 This creates both SVG and PNG files:
 
@@ -122,7 +122,7 @@ B D F#;Bm
 To generate the drawing of each chords, we use the following command:
 
 ```
-pianochords -e -p -s < minor-chords-1.txt
+printchord -e -p -s < minor-chords-1.txt
 ```
 
 And we obtain the following files:
