@@ -10,7 +10,7 @@
    preserveAspectRatio="xMinYMin meet"
    viewBox="0 0 282.0 100.0"
    width="282.0"
-   height="124.0">
+   height="154.0">
   <defs
      id="defs4516" />
   <metadata
@@ -267,6 +267,14 @@
   cy="64.0"
   style="fill:#000000;fill-opacity:1;stroke-width:0.38909313"
   />
+  <text
+     id="key_C"
+     y="102.4"
+     x="5.0"
+     style="font-style:normal;font-weight:bold;font-size:1.0em;line-height:2.5;font-family:monospace;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+     xml:space="preserve"><tspan
+       id="tspan_C">C</tspan>
+  </text>
   <circle
   id="path4"
   r="6.0"
@@ -274,6 +282,14 @@
   cy="32.4"
   style="fill:#ffffff;fill-opacity:1;stroke-width:0.38909313"
   />
+  <text
+     id="key_Eb"
+     y="91.04"
+     x="32.0"
+     style="font-style:normal;font-weight:bold;font-size:1.0em;line-height:2.5;font-family:monospace;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+     xml:space="preserve"><tspan
+       id="tspan_Eb">Eb</tspan>
+  </text>
   <circle
   id="path7"
   r="6.0"
@@ -281,6 +297,14 @@
   cy="32.4"
   style="fill:#ffffff;fill-opacity:1;stroke-width:0.38909313"
   />
+  <text
+     id="key_Gb"
+     y="91.04"
+     x="72.0"
+     style="font-style:normal;font-weight:bold;font-size:1.0em;line-height:2.5;font-family:monospace;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+     xml:space="preserve"><tspan
+       id="tspan_Gb">Gb</tspan>
+  </text>
   <circle
   id="path10"
   r="6.0"
@@ -288,5 +312,13 @@
   cy="64.0"
   style="fill:#000000;fill-opacity:1;stroke-width:0.38909313"
   />
+  <text
+     id="key_Bbb"
+     y="102.4"
+     x="105.0"
+     style="font-style:normal;font-weight:bold;font-size:1.0em;line-height:2.5;font-family:monospace;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+     xml:space="preserve"><tspan
+       id="tspan_Bbb">Bbb</tspan>
+  </text>
   </g>
 </svg>
