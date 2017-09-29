@@ -1,7 +1,7 @@
 # pianochords
 Drawing a piano keyboard with chord positions.
 
-![c_maj7.png](examples/c_maj7.png)
+![cdim7.png](examples/cdim7.svg)
 
 ## Motivation
 As you play keyboard by auto-learning and do not have music theory skills (you can not read scores), you may need to draw chords positions on a keyboard. Pianochords is a program to help doing that work and render as SVG and PNG.
