@@ -111,11 +111,12 @@ Let's try 3 different sizes of the same chord.
 for i in 1 3 5 ; do printchord -c "D F# A C" -f "d7-zoom-$i" --zoom $i -n "D7" -e ;done
 ```
 The result images are the following:
-![d7-zoom-1.png](examples/d7-zoom-1.png)
 
-![d7-zoom-3.png](examples/d7-zoom-3.png)
+`--zoom 1.0` : ![d7-zoom-1.png](examples/d7-zoom-1.png)
 
-![d7-zoom-5.png](examples/d7-zoom-5.png)
+`--zoom 3.0` : ![d7-zoom-3.png](examples/d7-zoom-3.png)
+
+`--zoom 5.0` : ![d7-zoom-5.png](examples/d7-zoom-5.png)
 
 
 ### Stream input
