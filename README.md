@@ -6,6 +6,7 @@ Drawing a piano keyboard with chord positions.
 ## Motivation
 As you play keyboard by auto-learning and do not have music theory skills (you can not read scores), you may need to draw chords positions on a keyboard to memorise them. Printchord is a program to help doing that work and renders chord drawings as SVG and PNG files.
 As I was talking to a friend of chord positions, I could not find any program to help me generate theses little piano chords pictures, so I wrote it to compose [this document](examples/triads.pdf).
+
 I hope printchord could be useful to others. Please let me know if you use it :-)
 
 ## Development
@@ -38,6 +39,7 @@ My goal is first to make printchord a usable tool in Linux CLI point of view. Th
 
 ## Examples of use
 
+### Basic
 Basic usage is:
 ```bash
 printchord --chord "C E G B"
@@ -45,6 +47,7 @@ printchord --chord "C E G B"
 That will print an SVG file content on standart output, representing a 2 scales piano keyboard with marks on the keys of the chord notes:
 [basic.svg](examples/basic.svg)
 
+### Redirect to file
 To put this output into a file, use system redirection
 ```bash
 printchord --chord "C E G B" > c_maj7.svg
@@ -52,6 +55,7 @@ printchord --chord "C E G B" > c_maj7.svg
 This creates the SVG file [c_maj.svg](examples/c_maj7.svg)
 
 From now you can visualize the chord in a modern browser by pointing to the URL `file:///path-to-my-chord/c_maj7.svg`
+
 If you have `inkscape` installed on your system, you probably have `inkview` tool too. Both allow you to view SVG files.
 ```bash
 inkview c_maj7.svg         # view svg file in an X window
@@ -62,7 +66,8 @@ If you are running Linux, you may also consider using [librsvg](https://wiki.gno
 rsvg-view-3 c_maj7.svg     # view svg file in an X window
 ```
 
-As most word processor prefer bitmap images to svg files, it is possible to export the result SVG file to PNG raster image with `-e` (`--export`) option
+### Export to PNG
+You may prefer to have bitmap images instead of svg files. For this reason it is possible to export the result SVG file to PNG raster image with `-e` (`--export`) option
 ```
 printchord --export -c "C E G B"
 ```
@@ -71,6 +76,9 @@ This example produces automatically SVG (`C-E-G-B.svg`) and PNG (`C-E-G-B.png`) 
 [C-E-G-B.svg](examples/C-E-G-B.svg)
 
 ![C-E-G-B.png](examples/C-E-G-B.png)
+
+
+### Chord name
 
 You may need to name the chord, you can do it with `-n` (`--chordname`) option
 ```
@@ -82,15 +90,35 @@ This creates both SVG and PNG files:
 
 ![cmaj7.png](examples/cmaj7.png)
 
-If you need notes name to appear below the keybord, then use the `-p` (`--printkey`) option
+### Notes name
+
+If you need notes name to appear below the keyboard, then use the `-p` (`--printkey`) option
 ```
-printchord -c "C E G B" --chordname "Cmaj7" -f c_maj7 -e
+printchord -c "C E G B" --chordname "Cmaj7" -f c-maj7 -e --printkey
 ```
 This creates both SVG and PNG files:
 
-[c_maj7.svg](examples/c_maj7.svg)
+[c-maj7.svg](examples/c-maj7.svg)
 
-![c_maj7.png](examples/c_maj7.png)
+![c-maj7.png](examples/c-maj7.png)
+
+### Zoom
+
+The default size of a chord drawing can be adapted with the `--zoom` option. This is not very useful with SVG file as they may be resized without quality loss, but the raster images may look ugly if zoomed with an image viewer. The `--zoom` option take a float number, 1.0 being the default value.
+
+Let's try 3 different sizes of the same chord.
+```
+for i in 1 3 5 ; do printchord -c "D F# A C" -f "d7-zoom-$i" --zoom $i -n "D7" -e ;done
+```
+The result images are the following:
+![d7-zoom-1.png](examples/d7-zoom-1.png)
+
+![d7-zoom-3.png](examples/d7-zoom-3.png)
+
+![d7-zoom-5.png](examples/d7-zoom-5.png)
+
+
+### Stream input
 
 You may want to prepare many chords in text file and draw them in one shot. The `-s` (`--stream`) option allows you to read chords from a file and draw one chord per row.
 
