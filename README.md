@@ -104,9 +104,9 @@ This creates both SVG and PNG files:
 
 ### Zoom
 
-The default size of a chord drawing can be adapted with the `--zoom` option. This is not very useful with SVG file as they may be resized without quality loss, but the raster images may look ugly if zoomed with an image viewer. The `--zoom` option take a float number, 1.0 being the default value.
+The default size of a chord drawing can be modified with the `--zoom` option. This is not very useful with SVG file as svg drawings can be resized without quality loss, but the raster images may look ugly if zoomed with an image viewer. The `--zoom` option takes a float number, 1.0 being the default value.
 
-Let's try 3 different sizes of the same chord.
+Let's try 3 different sizes of the same chord, zoom values 1.0, 3.0 and 5.0
 ```
 for i in 1 3 5 ; do printchord -c "D F# A C" -f "d7-zoom-$i" --zoom $i -n "D7" -e ;done
 ```
@@ -121,7 +121,7 @@ The result images are the following:
 
 ### Stream input
 
-You may want to prepare many chords in text file and draw them in one shot. The `-s` (`--stream`) option allows you to read chords from a file and draw one chord per row.
+You may want to prepare many chords in a text file and draw them in one shot. The `-s` (`--stream`) option allows you to read chords from a file and draw one chord per row.
 
 A row must be of the form `chord;chordname` e.g: `C E G B;Cmaj7`.
 
