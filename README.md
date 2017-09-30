@@ -112,7 +112,9 @@ for i in 1 3 5 ; do printchord -c "D F# A C" -f "d7-zoom-$i" --zoom $i -n "D7" -
 ```
 The result images are the following:
 ![d7-zoom-1.png](examples/d7-zoom-1.png)
+
 ![d7-zoom-3.png](examples/d7-zoom-3.png)
+
 ![d7-zoom-5.png](examples/d7-zoom-5.png)
 
 
