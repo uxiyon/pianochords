@@ -445,7 +445,7 @@ def svg_draw_chord(ch, ch_name):
     for note in ch:
         k = next(key for key in ALL_NOTES if key.name == note.title())
         if k.index < key_idx:
-            octv_shift = (7 * WTE_WIDTH)
+            octv_shift = (7 * WTE_WIDTH * zoom)
         svg_draw_mark(octv_shift, k)
         if printkey:
             svg_draw_keyname(octv_shift, k)
