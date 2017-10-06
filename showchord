@@ -13,7 +13,7 @@ The chord name may be provided to be printed above the keyboard
 Note names may be printed below the keyboard
 
 Synopsis:
-printchord  [[--stream] | [--chord "C E G B"] [--chordname "C MAJ7"]]
+showchord  [[--stream] | [--chord "C E G B"] [--chordname "C MAJ7"]]
             [--printkey]
             [--export]
             [--zoom]
