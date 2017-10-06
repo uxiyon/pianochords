@@ -1,60 +1,76 @@
-# printchord
-Drawing a piano keyboard with chord positions.
+# showchord
+Drawing a chord on a piano keyboard to show how to play it.
 
 ![cdim7.png](examples/cdim7.png)
 
 ## Motivation
-As you play keyboard by auto-learning and do not have music theory skills (you can not read scores), you may need to draw chords positions on a keyboard to memorise them. Printchord is a program to help doing that work and renders chord drawings as SVG and PNG files.
-As I was talking to a friend of chord positions, I could not find any program to help me generate theses little piano chords pictures, so I wrote it to compose [this document](examples/triads.pdf).
+As you play keyboard by auto-learning and do not have music theory skills (you can not read scores), you may need to draw a chord as marks on a keyboard to see how to play it. Showchord is a program to help doing that. It renders chord drawings as SVG and PNG images.
 
-I hope printchord could be useful to others. Please let me know if you use it :-)
+As I once was talking to a friend of piano chord positions, I could not find any program to help me generate these little piano chord pictures, so I wrote showchord. Then I could compose [this triads document](examples/triads.pdf) to help my friend learn basic chords.
+
+The idea behind showchord is to be able to automate piano chord drawings from few information: the notes of the chords.
+
+I hope showchord could be useful to others. You may use it to write a piano method for example.
+
+Please let me know if you use it and tell me if you find it easy (or not) to use :-)
 
 ## Development
-Printchord is developed with python as a language learning exercise.
-My goal is first to make printchord a usable tool in Linux CLI point of view. The idea behind it is to be able to automate piano chord drawings from few information: the notes of the chord.
+Showchord was first written in shell (bash) but I found very difficult to describe note structure clearly with shell. Then I switched to python for its rich types. I also choosed python among other languages to learn it.
+
+My goal is to make showchord a usable tool in Linux CLI point of view, to make it possible to write scripts generating documents with chord representations. I also want to keep programing style as clear as possible to make code evolutions easy.
 
 ### Depencies
-1. Python modules
+1. Python modules (mandatory)
     - os
     - sys
     - subprocess
     - argparse
     - collections (namedtuple)
 
-2. External programs
+2. External programs (optional, only required for bitmap export)
     - [Inkscape](https://inkscape.org/) is needed to transform SVG to PNG with --export option
     - If you are running Linux and do not want to install Inkscape, then consider using [librsvg](https://wiki.gnome.org/Projects/LibRsvg) instead, for exporting (rsvg-export command line tool)
 
+Note : you do not need any external program to generate SVG images
+
 ## Features
 
-  * Draw an empty 2 octaves keyboard - eventually with a title
+  * Draw an empty 2 octaves keyboard - eventually with a title - SVG output format
   * Draw any chord you can imaging (on a 2 octave keyboard) by giving notes name. The chord is represented by round marks on the keys
   * Print a title above the keyboard
   * Print note names below the marked keys
   * Export to bitmap (PNG) file (by default, resulting SVG file is written on stdout)
   * Force output filename
-  * Provide zoom value to change the (SVG) drawing size
-  * Generate many chords at once from informations given in a CSV file (stream mode)
+  * Provide zoom value to change the drawing size
+  * Generate many chords at once from informations taken from a stream (stream mode)
 
 
 ## Examples of use
 
 ### Basic
-Basic usage is:
+The most basic usage of showchord is without any argument. This produces a two scales keyboard whithout any mark or title.
 ```bash
-printchord --chord "C E G B"
+showchord
 ```
-That will print an SVG file content on standart output, representing a 2 scales piano keyboard with marks on the keys of the chord notes:
-[basic.svg](examples/basic.svg)
+The result on standart output is the equivalent of this [basic.svg](examples/basic.svg) file.
+
+
+Another more common basic usage is with `--chord` (`-c`) option:
+```bash
+showchord --chord "C E G B"
+```
+That prints an SVG file content on standart output, representing a 2 scales piano keyboard with marks on the keys of the chord notes:
+[basic_cmaj7.svg](examples/basic_cmaj7.svg)
 
 ### Redirect to file
 To put this output into a file, use system redirection
 ```bash
-printchord --chord "C E G B" > c_maj7.svg
+showchord --chord "C E G B" > c_maj7.svg
 ```
 This creates the SVG file [c_maj.svg](examples/c_maj7.svg)
 
 From now you can visualize the chord in a modern browser by pointing to the URL `file:///path-to-my-chord/c_maj7.svg`
+
 
 If you have `inkscape` installed on your system, you probably have `inkview` tool too. Both allow you to view SVG files.
 ```bash
@@ -67,9 +83,9 @@ rsvg-view-3 c_maj7.svg     # view svg file in an X window
 ```
 
 ### Export to PNG
-You may prefer to have bitmap images instead of svg files. For this reason it is possible to export the result SVG file to PNG raster image with `-e` (`--export`) option
+You may prefer to have bitmap images instead of svg files. For this reason it is possible to export the result SVG file to PNG raster image with `--export` (`-e`) option
 ```
-printchord --export -c "C E G B"
+showchord --export -c "C E G B"
 ```
 This example produces automatically SVG (`C-E-G-B.svg`) and PNG (`C-E-G-B.png`) files:
 
@@ -82,7 +98,7 @@ This example produces automatically SVG (`C-E-G-B.svg`) and PNG (`C-E-G-B.png`) 
 
 You may need to name the chord, you can do it with `-n` (`--chordname`) option
 ```
-printchord -c "C E G B" --chordname "Cmaj7" -f cmaj7 -e
+showchord -c "C E G B" --chordname "Cmaj7" -f cmaj7 -e
 ```
 This creates both SVG and PNG files:
 
@@ -94,7 +110,7 @@ This creates both SVG and PNG files:
 
 If you need notes name to appear below the keyboard, then use the `-p` (`--printkey`) option
 ```
-printchord -c "C E G B" --chordname "Cmaj7" -f c-maj7 -e --printkey
+showchord -c "C E G B" --chordname "Cmaj7" -f c-maj7 -e --printkey
 ```
 This creates both SVG and PNG files:
 
@@ -108,7 +124,7 @@ The default size of a chord drawing can be modified with the `--zoom` option. Th
 
 Let's try 3 different sizes of the same chord, zoom values 1.0, 3.0 and 5.0
 ```
-for i in 1 3 5 ; do printchord -c "D F# A C" -f "d7-zoom-$i" --zoom $i -n "D7" -e ;done
+for i in 1 3 5 ; do showchord -c "D F# A C" -f "d7-zoom-$i" --zoom $i -n "D7" -e ;done
 ```
 The result images are the following:
 
@@ -151,7 +167,7 @@ B D F#;Bm
 To generate the drawing of each chords, we use the following command:
 
 ```
-printchord -e -p -s < minor-chords-1.txt
+showchord -e -p -s < minor-chords-1.txt
 ```
 
 And we obtain the following files:
