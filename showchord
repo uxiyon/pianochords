@@ -1,0 +1,604 @@
+#!/usr/bin/python
+
+'''################################################################
+(c) Alain Cherpin - alain.cherpin@gmail.com
+
+Released under GNU GENERAL PUBLIC LICENSE, Version 3, 29 June 2007
+
+Given a sequence of music notes, draw a piano keyboard
+with marks on the corresponding keys
+
+The note sequence must be from low to high (left to right)
+The chord name may be provided to be printed above the keyboard
+Note names may be printed below the keyboard
+
+Synopsis:
+showchord  [[--stream] | [--chord "C E G B"] [--chordname "C MAJ7"]]
+            [--printkey]
+            [--export]
+            [--zoom]
+            [--file <filename>]
+
+if nothing is given, then only draw a 2 octaves keyboard
+
+requirements:
+ linux like OS
+ python2+
+ inkscape 0.92+ (export function)
+##################################################################'''
+
+##################################################################
+# TODO:
+# - provide main chords
+# - if more than one chord is provided, organize them in an array
+# - allow to give a title to the page
+# - allow to export to pdf
+##################################################################
+
+## module import
+
+# required to use print(string, file=sys.stdout) in python 2
+from __future__ import print_function
+
+import os, sys, subprocess
+from collections import namedtuple
+import argparse
+
+## constants
+WTE_WIDTH = 10
+WTE_HEIGHT = (4 * WTE_WIDTH)
+WTE_INIT_OFFSET = 0
+WTE_COLOR = "#ffffff"
+WTE_OPACITY = 1
+WTE_TYPE = 0
+WTE_MARK_V_OFFSET = (3.2 * WTE_WIDTH)
+#WTE_MARK_COLOR = "#00c000"
+WTE_MARK_COLOR = "#000000"
+
+BLK_SHIFT = 1     # specific black key shift value
+BLK_WIDTH = 6
+BLK_HEIGHT = (4 * BLK_WIDTH)
+BLK_INIT_OFFSET = (WTE_WIDTH - (BLK_WIDTH / 2) )
+BLK_COLOR = "#000000"
+BLK_OPACITY = 1
+BLK_TYPE = 1
+BLK_MARK_V_OFFSET = (2.7 * BLK_WIDTH)
+#BLK_MARK_COLOR = "#00c000"
+BLK_MARK_COLOR = "#ffffff"
+
+
+OUTPUT = sys.stdout
+TMP_FILENAME = "new_chord"
+SVG_ID = "chords"
+HEIGHT_TITLE = 20
+HEIGHT_PRINTKEY = 15
+CHORD_Y_SHIFT = 20
+MARK_RADIUS = 3
+
+EXPORT_CMD = {'inkscape': ' -D -f {} -e {} >/dev/null',
+              'rsvg-convert': ' {} -o {} -a >/dev/null'}
+
+export_cmd = ''
+
+## variables fed from arguments
+chord = []
+chord_input = ''
+chordname = ''
+printkey = False
+export = False
+stream_mode = False
+filename = ''
+header_printed = False
+height_title = 0
+height_printkey = 0
+zoom = 1
+
+###########################
+# define a note representation
+Key = namedtuple('Key', ['name', 'index', 'h_offset', 'h_shift', 'type'])
+KeyDim = namedtuple('KeyDim', ['width', 'height'])
+KeyApp = namedtuple('KeyApp', ['color'])
+KeyMark = namedtuple('KeyMark', ['color', 'v_offset'])
+KeyType = namedtuple('NteType', ['h_init_offset', 'dim', 'app', 'mark'])
+
+# 2 types of keys
+## white
+wte_dim = KeyDim(WTE_WIDTH, WTE_HEIGHT)
+wte_app = KeyApp(WTE_COLOR)
+wte_mark = KeyMark(WTE_MARK_COLOR, WTE_MARK_V_OFFSET)
+white = KeyType(WTE_INIT_OFFSET, wte_dim, wte_app, wte_mark)
+
+## black
+blk_dim = KeyDim(BLK_WIDTH, BLK_HEIGHT)
+blk_app = KeyApp(BLK_COLOR)
+blk_mark = KeyMark(BLK_MARK_COLOR, BLK_MARK_V_OFFSET)
+black = KeyType(BLK_INIT_OFFSET, blk_dim, blk_app, blk_mark)
+
+# define all 12 notes
+C_sflat  = Key('Cbb', 11, 5, 1, black)
+C_flat  = Key('Cb', 12, 6, 0, white)
+C       = Key('C', 1, 0, 0, white)
+C_sharp = Key('C#', 2, 0, -1, black)
+C_ssharp = Key('Cx', 3, 1, 0, white)
+
+D_sflat  = Key('Dbb', 1, 0, 1, white)
+D_flat  = Key('Db', 2, 0, -1, black)
+D       = Key('D', 3, 1, 0, white)
+D_sharp = Key('D#', 4, 1, 1, black)
+D_ssharp = Key('Dx', 5, 2, 0, white)
+
+E_sflat  = Key('Ebb', 3, 1, 0, white)
+E_flat  = Key('Eb', 4, 1, 1, black)
+E       = Key('E', 5, 2, 0, white)
+E_sharp = Key('E#', 6, 3, 0, white)
+E_ssharp = Key('Ex', 7, 3, -1, black)
+
+F_sflat  = Key('Fbb', 4, 1, 1, black)
+F_flat  = Key('Fb', 5, 2, 0, white)
+F       = Key('F', 6, 3, 0, white)
+F_sharp = Key('F#', 7, 3, -1, black)
+F_ssharp = Key('Fx', 8, 4, 0, white)
+
+G_sflat  = Key('Gbb', 6, 3, 0, white)
+G_flat  = Key('Gb', 7, 3, -1, black)
+G       = Key('G', 8, 4, 0, white)
+G_sharp = Key('G#', 9, 4, 0, black)
+G_ssharp = Key('Gx', 10, 5, 0, white)
+
+A_sflat  = Key('Abb', 8, 4, 0, white)
+A_flat  = Key('Ab', 9, 4, 0, black)
+A       = Key('A', 10, 5, 0, white)
+A_sharp = Key('A#', 11, 5, 1, black)
+A_ssharp = Key('Ax', 12, 6, 0, white)
+
+B_sflat  = Key('Bbb', 10, 5, 0, white)
+B_flat  = Key('Bb', 11, 5, 1, black)
+B       = Key('B', 12, 6, 0, white)
+B_sharp = Key('B#', 1, 0, 0, white)
+B_ssharp = Key('Bx', 2, 0, -1, black)
+
+# all 12 notes ordered to be drawn in svg
+# the order is important for the black to overlap whites
+TWELVE = [C, D, E, F, G, A, B, B_sharp, C_sharp, D_sharp, E_sharp, F_sharp, G_sharp, A_sharp]
+
+ALL_NOTES = [C, D, E, F, G, A, B,
+             C_sharp, D_sharp, E_sharp, F_sharp, G_sharp, A_sharp, B_sharp,
+             C_flat, D_flat, E_flat, F_flat, G_flat, A_flat, B_flat,
+             C_sflat, D_sflat, E_sflat, F_sflat, G_sflat, A_sflat, B_sflat,
+             C_ssharp, D_ssharp, E_ssharp, F_ssharp, G_ssharp, A_ssharp, B_ssharp]
+
+
+###############################################
+# functions
+###############################################
+
+###############################################
+# command line arguments
+def args():
+    global chord
+    global chord_input
+    global chordname
+    global height_title
+    global printkey
+    global height_printkey
+    global export
+    global filename
+    global stream_mode
+    global zoom
+
+    parser = argparse.ArgumentParser(description='Print chords on a piano keyboard')
+
+    # WARNING: default apply only if argument is *not* given
+    parser.add_argument('--chord', '-c', action='store', help='Notes of the chord - ex. "C Eb Gb Bbb"')
+    parser.add_argument('--chordname', '-n', action='store', help='Chord name shown above the keyboard')
+    parser.add_argument('--printkey', '-p', action='store_true', help='Print chord key names')
+    parser.add_argument('--filename', '-f', action='store', help='File name to store chord drawing')
+    parser.add_argument('--export', '-e', action='store_true', help='Export to PNG file')
+    parser.add_argument('--zoom', '-z', type=float, action='store', help='Zoom value (float), e.g: 2.0 to double output SVG drawing size')
+    parser.add_argument('--stream', '-s', action='store_true', help='Switch to stream mode')
+
+    args = parser.parse_args()
+
+    # chord is a list of notes
+    if args.chord:
+        chord_input = args.chord.title()
+        chord = chord_input.split()
+
+    # chord name
+    if args.chordname:
+        chordname = args.chordname
+        height_title = HEIGHT_TITLE
+
+    # print chord key names
+    printkey = args.printkey
+    if printkey:
+        height_printkey = HEIGHT_PRINTKEY
+
+    # file name to store chord drawing
+    if args.filename:
+        filename = args.filename
+
+    # export to bitmap
+    export = args.export
+
+    # zoom factor
+    if args.zoom:
+        zoom = args.zoom
+
+    # stream mode
+    stream_mode = args.stream
+
+###############################################
+# check if cmd exists and is executable on OS
+# return command full name on success
+# or empty string on failed search
+def export_cmd_fullname(cmd):
+    for path in os.environ["PATH"].split(os.pathsep):
+        if os.access(os.path.join(path, cmd), os.X_OK):
+            return os.path.join(path, cmd)
+    return ''
+
+###############################################
+# return full shell svg to png command
+# expression made out of EXPORT_CMD dictionary
+# content
+# return an empty string if none commands are
+# found on the OS
+def export_cmd_expr():
+    cmds = EXPORT_CMD.keys()
+    cmds.sort()
+    for cmd in cmds:
+        cmd_name = export_cmd_fullname(cmd)
+        if not cmd_name:
+            continue
+        return cmd + EXPORT_CMD[cmd]
+
+    return ''
+
+###############################################
+# print begining of svg file
+def svg_open():
+    svg_header = '''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   id="chords"
+   version="1.1"
+   preserveAspectRatio="xMinYMin meet"
+   viewBox="{} {} {} {}"
+   width="{}"
+   height="{}">
+  <defs
+     id="defs4516" />
+  <metadata
+     id="metadata4519">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>'''
+
+    vbox_x = 0
+    vbox_y = 0
+    vbox_width = 141 * zoom
+    vbox_heigth = (30 + height_title) * zoom
+    width = 141 * zoom
+    height = (42 + height_title + height_printkey) * zoom
+    print(svg_header.format(vbox_x,
+                            vbox_y,
+                            vbox_width,
+                            vbox_heigth,
+                            width,
+                            height),
+                            file=OUTPUT)
+
+###############################################
+# print svg group open
+def svg_g_open(cho_name):
+    x_translate = 0
+    y_translate = 0
+    if cho_name != '':
+        y_translate = CHORD_Y_SHIFT * zoom
+        svg_draw_title(cho_name)
+
+    svg_group = '''  <g
+    transform="translate({},{})"
+    id="chord{}">'''
+
+    print(svg_group.format(x_translate,
+                           y_translate,
+                           cho_name),
+                           file=OUTPUT)
+
+###############################################
+# print svg group end
+def svg_g_close():
+    print("  </g>", file=OUTPUT)
+
+###############################################
+# print svg file end
+def svg_close():
+    print("</svg>", file=OUTPUT)
+
+###############################################
+# draw the given key as svg rectangle
+def svg_draw_key(octave_shift, key):
+    x = octave_shift + ((key.h_offset * WTE_WIDTH) + key.type.h_init_offset) * zoom
+    y = 0
+    svg_key = '''    <rect
+    id="{}"
+    width="{}"
+    height="{}"
+    x="{}"
+    y="{}"
+    style="fill:{};fill-opacity:1;stroke:#000000;stroke-width:1;stroke-opacity:1"
+    />'''
+    print(svg_key.format(key.index,
+                         key.type.dim.width * zoom,
+                         key.type.dim.height * zoom,
+                         x,
+                         y,
+                         key.type.app.color),
+                         file=OUTPUT)
+
+##############################################
+# draw a mark on the given note as svg circle
+def svg_draw_mark(octave_shift, key):
+    r_value = MARK_RADIUS * zoom
+    cx = octave_shift + ((key.h_offset * WTE_WIDTH + (WTE_WIDTH / 2)) + key.type.h_init_offset * 0.7) * zoom
+    cy = key.type.mark.v_offset * zoom
+    svg_mark = '''  <circle
+  id="path{}"
+  r="{}"
+  cx="{}"
+  cy="{}"
+  style="fill:{};fill-opacity:1;stroke-width:0.38909313"
+  />'''
+
+    print(svg_mark.format(key.index,
+                          r_value,
+                          cx,
+                          cy,
+                          key.type.mark.color),
+                          file=OUTPUT)
+
+###############################################
+def svg_draw_keyname(octave_shift, key):
+    x = octave_shift + ((key.h_offset * WTE_WIDTH + (WTE_WIDTH * 0.25)) + key.type.h_init_offset * 0.5) * zoom
+    y = (key.type.mark.v_offset * 1.6 + (key.type.h_init_offset * 2.8)) * zoom
+    font_size = 0.5 * zoom
+    line_height = 1.25 * zoom
+
+    keyname = '''  <text
+     id="key_{}"
+     y="{}"
+     x="{}"
+     style="font-style:normal;font-weight:bold;font-size:{}em;line-height:{};font-family:monospace;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+     xml:space="preserve"><tspan
+       id="tspan_{}">{}</tspan>
+  </text>'''
+    print(keyname.format(key.name.title(),
+                         y,
+                         x,
+                         font_size,
+                         line_height,
+                         key.name.title(),
+                         key.name.title()),
+                         file=OUTPUT)
+
+###############################################
+# draw chord name as svg text
+def svg_draw_title(label):
+    y = 14 * zoom
+    x = ((140 - (len(label) * 6)) / 2) * zoom
+    font_size = zoom
+    line_height = 1.25 * zoom
+    svg_title = '''  <text
+     id="title_{}"
+     y="{}"
+     x="{}"
+     style="font-style:normal;font-weight:bold;font-size:{}em;line-height:{};font-family:monospace;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+     xml:space="preserve"><tspan
+       id="tspanTITLE">{}</tspan>
+  </text>'''
+
+    print(svg_title.format(sanitize(label),
+                           y,
+                           x,
+                           font_size,
+                           line_height,
+                           label),
+                           file=OUTPUT)
+
+###############################################
+# draw a 2 octaves keyboard
+def draw_svg_kbd(cho_name):
+    svg_g_open(cho_name)
+
+    o_shift = 0
+    # draw notes of 2 octaves
+    for octv in range(0,2):
+        o_shift = (octv * 7 * WTE_WIDTH * zoom)
+        for nte in TWELVE:
+            svg_draw_key(o_shift, nte)
+
+
+###############################################
+def svg_draw_chord(ch, ch_name):
+
+    # draw keyboard on 2 octaves
+    draw_svg_kbd(ch_name)
+
+    ## draw a mark on the keys of the given chord
+    #  and the note name if printkey is set
+    octv_shift = 0
+    key_idx = 0
+
+    for note in ch:
+        k = next(key for key in ALL_NOTES if key.name == note.title())
+        if k.index < key_idx:
+            octv_shift = (7 * WTE_WIDTH * zoom)
+        svg_draw_mark(octv_shift, k)
+        if printkey:
+            svg_draw_keyname(octv_shift, k)
+        key_idx = k.index
+
+    svg_g_close()
+
+###############################################
+# check if all note names in given chord are correct
+# else raise a NameError exception returning bad note name
+def check_chord(ch):
+    sanit_chord = []
+
+    for note in ch:
+        try:
+            k = next(key for key in ALL_NOTES if key.name == note.title())
+            sanit_chord.append(note.title())
+
+        # note not found
+        except StopIteration:
+            raise NameError(note)
+
+    return sanit_chord
+
+###############################################
+def sanitize(name):
+    tmp = name.replace(" ", "_")
+    tmp = tmp.replace("#","sharp")
+    tmp = tmp.replace("b","flat")
+    return tmp
+
+###############################################
+# add or replace filename extension
+# return name with the given extension
+def set_extension(name, ext):
+
+    if name == '':
+        return name
+
+    tmplist = name.split(".")
+
+    # remove extension if present
+    if len(tmplist) > 1:
+        del tmplist[len(tmplist) - 1]
+
+    # recompose original name without original ext
+    # and add the given extension
+    return '.'.join(tmplist) + ext
+
+###############################################
+## main
+
+# get script options and arguments
+args()
+
+# exit if at least one bad note name is given
+try:
+    chord = check_chord(chord)
+except NameError as e:
+    print('''"{}" is not a valid note name
+    Authorized note names are:
+    C D E F G A B
+    Accidentals are # and b
+    e.g: "C Eb G#"'''.format(str(e)), file=sys.stderr)
+    sys.exit(1)
+
+# stream mode means read input stream until EOF is reached and
+# draw one chord for each line.
+# line should be of the following form:
+# C E G;C major
+# i.e: 2 parts: chord;chordname
+
+if stream_mode:
+    for line in sys.stdin:
+        # forward options
+        export_option = ''
+        if export:
+            export_option = ' --export'
+
+        printkey_option = ''
+        if printkey:
+            printkey_option = ' --printkey'
+
+        chord_parts = line.split(';')
+        if len(chord_parts) > 0:
+            chord_option = chord_parts[0]
+        else:
+            next
+
+        if len(chord_parts) > 1:
+            # join used to remove trailing \n
+            chordname_option = ''.join(chord_parts[1].split())
+        else:
+            chordname_option = '-'.join(chord_option.split())
+            # first letter uppercase
+            chordname_option = chordname_option.title()
+
+        cmdline = sys.argv[0] + ' --chord "' + chord_option + '" --chordname "' + chordname_option + '"' + export_option + printkey_option
+
+        # call chords script in normal mode
+        subprocess.call(cmdline, shell = True)
+
+    sys.exit(0)
+
+
+# not in stream mode
+svg_name = ''
+
+# filename is given, first assume it is for svg output
+if filename != '':
+    svg_name = set_extension(filename, ".svg")
+
+# export to png
+if export:
+    # export_cmd is a full svg to png shell command expression
+    # made from EXPORT_CMD content
+    export_cmd = export_cmd_expr()
+
+    ext = ".png"
+    export_fname = set_extension(TMP_FILENAME, ext)
+    if filename != '':
+        export_fname = set_extension(filename, ext)
+    elif chordname != '':
+        export_fname = set_extension(sanitize(chordname), ext)
+    elif len(chord) > 0:
+        export_fname = set_extension(sanitize('-'.join(chord_input.split())), ext)
+
+    if svg_name == '':
+        svg_name = set_extension(export_fname, ".svg")
+
+
+
+# automatically write to stdout or
+# to a file depending on --export option
+if export or filename != '':
+    # OUTPUT default is sys.stdout
+    OUTPUT = open(svg_name, 'w')
+
+# first export to svg
+svg_open()
+svg_draw_chord(chord, chordname)
+svg_close()
+
+OUTPUT.close()
+
+# export svg to png bitmap
+if export:
+    if export_cmd != '':
+        # export_cmd expression must contain exactely 2 pairs of empty
+        # braces ...{}...{}... to be filled with svg_name and export_fname
+        subprocess.call(export_cmd.format(svg_name, export_fname), shell=True)
+    else:
+        print("No export command found in " + str(EXPORT_CMD.keys()),
+              file=sys.stderr)
+
+sys.exit(0)
