@@ -13,27 +13,44 @@ The chord name may be provided to be printed above the keyboard
 Note names may be printed below the keyboard
 
 Synopsis:
-showchord  [[--stream] | [--chord "C E G B"] [--title "C MAJ7"]]
-            [--keyprint]
-            [--export]
-            [--zoom]
-            [--file <filename>]
+showchord [-h] [--keyprint] [--fileprefix FILEPREFIX] [--export]
+                 [--zoom ZOOM] ['C E G B;Cmaj7' '' 'a c# e g#;Amaj7']
 
-if nothing is given, then only draw a 2 octaves keyboard
+Three examples giving the same result:
+
+# chords given at command line
+showchord -k -e -z 3 'C E G B;Cmaj7' '' 'a c# e g#;Amaj7'
+
+# chords given from a pipe stream
+echo 'C E G B;Cmaj7' '' 'a c# e g#;Amaj7' | showchord -k -e -z 3
+
+# chords provided from a file stream
+cat >chords.lst<<EOF
+C E G B;Cmaj7
+
+a c# e g#;Amaj7
+EOF
+
+showchord -k -e -z 3 < chords.lst
+
+$ showchord -e -k -z 3
+'C E G;C'
+'a c# e g#;Amaj7'
+''
+';Dmin7'
+^C
+
+if no chord is given, then switches to stream mode and waits for 
+input from stdin
+
+NOTE: chords as arguments override any stream input, i.e: stream
+input is switched on only if no chord is provided as arguments
 
 requirements:
  linux like OS
  python2+
  inkscape 0.92+ (export function)
 ##################################################################'''
-
-##################################################################
-# TODO:
-# - provide main chords
-# - if more than one chord is provided, organize them in an array
-# - allow to give a title to the page
-# - allow to export to pdf
-##################################################################
 
 ## module import
 
@@ -52,7 +69,6 @@ WTE_COLOR = "#ffffff"
 WTE_OPACITY = 1
 WTE_TYPE = 0
 WTE_MARK_V_OFFSET = (3.2 * WTE_WIDTH)
-#WTE_MARK_COLOR = "#00c000"
 WTE_MARK_COLOR = "#000000"
 
 BLK_SHIFT = 1     # specific black key shift value
@@ -63,12 +79,10 @@ BLK_COLOR = "#000000"
 BLK_OPACITY = 1
 BLK_TYPE = 1
 BLK_MARK_V_OFFSET = (2.7 * BLK_WIDTH)
-#BLK_MARK_COLOR = "#00c000"
 BLK_MARK_COLOR = "#ffffff"
 
 
 OUTPUT = sys.stdout
-TMP_FILENAME = "new_chord"
 SVG_ID = "chords"
 HEIGHT_TITLE = 20
 HEIGHT_PRINTKEY = 15
@@ -81,16 +95,26 @@ EXPORT_CMD = {'inkscape': ' -D -f {} -e {} >/dev/null',
 export_cmd = ''
 
 ## variables fed from arguments
-chord = []
-chord_input = ''
-chordname = ''
+
+# list of chords of the forme 'N N N N;Chord Name'
+chords = []
+
+# print note name under marked key
 keyprint = False
+
+# export to PNG
 export = False
-stream_mode = False
-filename = ''
-header_printed = False
+
+# file prefix to compose output file
+fileprefix = 'chord_'
+
+# free space above keyboard to print title
 height_title = 0
+
+# free space below keyboard to print note names
 height_keyprint = 0
+
+# zoom value
 zoom = 1
 
 # 35 representable notes on a single scale with
@@ -131,7 +155,6 @@ NOTES = {'Cbb' : 10,
          'B#': 0,
          'Bx': 1}
 
-
 ###########################
 # define a note representation
 
@@ -160,12 +183,17 @@ blk_app = KeyApp(BLK_COLOR)
 blk_mark = KeyMark(BLK_MARK_COLOR, BLK_MARK_V_OFFSET)
 black = KeyType(BLK_INIT_OFFSET, blk_dim, blk_app, blk_mark)
 
-# note lists for drawing
+# note lists for drawing keyboard as in SVG black keys
+# must be after to override white keys
 WHITES = ['C', 'D', 'E', 'F', 'G', 'A', 'B']
 BLACKS = ['C#', 'D#', 'F#', 'G#', 'A#']
 
-# 12 notes representation specification by id
+# 12 notes representation by id, ordered from their 
+# position on the piano keyboard
 # the implicite id is the link between NOTES and NOTES_REPR
+# First value is white note index
+# Second value is shift direction -1:left, 0:center, 1:right
+# white or black are structure containing drawing information
 NOTES_REPR = []
 NOTES_REPR.append([0, 0, white])	# 0  : C
 NOTES_REPR.append([0, -1, black])       # 1  : C#
@@ -180,7 +208,6 @@ NOTES_REPR.append([5, 0, white])	# 9  : A
 NOTES_REPR.append([5, 1, black])	# 10 : A#
 NOTES_REPR.append([6, 0, white])	# 11 : B
 
-
 ###############################################
 # functions
 ###############################################
@@ -188,59 +215,66 @@ NOTES_REPR.append([6, 0, white])	# 11 : B
 ###############################################
 # command line arguments
 def args():
-    global chord
-    global chord_input
-    global chordname
-    global height_title
+    global chords
     global keyprint
     global height_keyprint
     global export
-    global filename
-    global stream_mode
+    global fileprefix
     global zoom
 
-    parser = argparse.ArgumentParser(description='Print chords on a piano keyboard')
+    parser = argparse.ArgumentParser(description='Show chord notes on a piano keyboard')
 
-    # WARNING: default apply only if argument is *not* given
-    parser.add_argument('--chord', '-c', action='store', help='Notes of the chord - ex. "C Eb Gb Bbb"')
-    parser.add_argument('--title', '-t', action='store', help='Title shown above the keyboard')
-    parser.add_argument('--keyprint', '-k', action='store_true', help='Print note key names below the keyboard')
-    parser.add_argument('--filename', '-f', action='store', help='File name to store chord drawing')
-    parser.add_argument('--export', '-e', action='store_true', help='Export to PNG file')
-    parser.add_argument('--zoom', '-z', type=float, action='store', help='Zoom value (float), e.g: 2.0 to double output SVG drawing size')
-    parser.add_argument('--stream', '-s', action='store_true', help='Switch to stream mode')
+    # optional list of chords
+    # if no chord provided then enter in stream mode
+    # chords is a list of chords of the form 'N N N;chord title'
+    # ex: 'D F# A;D major' 'e g# B;E' 'E A b c'
+    parser.add_argument('chords',
+	nargs='*',
+	help='Notes of the chord, followed or not by chord name - ex. "C Eb Gb Bbb;Cdim7" "C E G"')
 
+    # print note name below each marked key
+    parser.add_argument('--keyprint', '-k',
+	action='store_true',
+	help='Print note key names below the keyboard')
+
+    # set prefix for automatic file name
+    parser.add_argument('--fileprefix', '-f',
+	action='store',
+	help='File prefix to auto-generated filenames to store chord images')
+
+    # export to PNG image file format
+    parser.add_argument('--export', '-e',
+	action='store_true',
+	help='Export to PNG file')
+
+    # zoom output SVG image (and PNG if --export is set)
+    parser.add_argument('--zoom', '-z',
+	type=float,
+	action='store',
+	help='Zoom value (float), e.g: 2.0 to double output SVG drawing size')
+
+    # parse command line and set args.<option> values
     args = parser.parse_args()
 
-    # chord is a list of notes
-    if args.chord:
-        chord_input = args.chord.title()
-        chord = chord_input.split()
+    # store provided chords in chords list
+    for chord in args.chords:
+        chords.append(chord.capitalize())
 
-    # chord name
-    if args.title:
-        chordname = args.title
-        height_title = HEIGHT_TITLE
-
-    # print chord key names
+    # store keyprint choice, if true set height of note name space
     keyprint = args.keyprint
     if keyprint:
         height_keyprint = HEIGHT_PRINTKEY
 
-    # file name to store chord drawing
-    if args.filename:
-        filename = args.filename
+    # override default fileprefix
+    if args.fileprefix:
+        fileprefix = args.fileprefix
 
-    # export to bitmap
+    # store export choice
     export = args.export
 
-    # zoom factor
+    # store zoom factor
     if args.zoom:
         zoom = args.zoom
-
-    # stream mode
-    stream_mode = args.stream
-
 
 ###############################################
 # check if external cmd exists and is executable on OS
@@ -271,7 +305,7 @@ def export_cmd_expr():
 
 ###############################################
 # print begining of svg file
-def svg_open():
+def svg_open(title, height_kprint):
     svg_header = '''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
@@ -300,12 +334,14 @@ def svg_open():
     </rdf:RDF>
   </metadata>'''
 
+    height = HEIGHT_TITLE
+    if title == '': height = 0
     vbox_x = 0
     vbox_y = 0
-    vbox_width = 141 * zoom
-    vbox_heigth = (30 + height_title) * zoom
-    width = 141 * zoom
-    height = (42 + height_title + height_keyprint) * zoom
+    vbox_width = 142 * zoom
+    vbox_heigth = (30 + height) * zoom
+    width = 142 * zoom
+    height = (42 + height + height_kprint) * zoom
     print(svg_header.format(vbox_x,
                             vbox_y,
                             vbox_width,
@@ -317,7 +353,7 @@ def svg_open():
 ###############################################
 # print svg group open
 def svg_g_open(title):
-    x_translate = 0
+    x_translate = 1
     y_translate = 1
     if title != '':
         y_translate = CHORD_Y_SHIFT * zoom
@@ -469,6 +505,11 @@ def svg_draw_chord(ch, ch_name):
 
     ## draw a mark on the keys of the given chord
     #  and the note name if keyprint is set
+
+    if not ch:
+        svg_g_close()
+        return 0
+
     octv_shift = 0
     key_idx = 0
 
@@ -482,28 +523,28 @@ def svg_draw_chord(ch, ch_name):
         key_idx = k_idx
 
     svg_g_close()
+    return 0
 
 ###############################################
 # check if all note names in given chord are correct
 # else raise a NameError exception that returns the bad note name
 def check_chord(ch):
-    sanit_chord = []
-
+    cleaned_chord = []
     for note in ch:
-        if note in NOTES:
-            sanit_chord.append(note.title())
+        if note.capitalize() in NOTES:
+            cleaned_chord.append(note.capitalize())
         else:
             # note not found
             raise NameError(note)
 
-    return sanit_chord
+    return cleaned_chord
 
 ###############################################
 # cleanup name to be OS compatible
 def sanitize(name):
-    tmp = name.replace(" ", "_")
-    tmp = tmp.replace("#","sharp")
-    tmp = tmp.replace("b","flat")
+    tmp = name.replace("_ ", "_")
+    tmp = tmp.replace(" ", "_")
+    tmp = tmp.replace("#","s")
     return tmp
 
 ###############################################
@@ -524,118 +565,115 @@ def set_extension(name, ext):
     return '.'.join(tmplist) + ext
 
 ###############################################
-## main
+# main ########################################
+###############################################
 
 # get script options and arguments
+# this may provide chords in chords list
 args()
 
-# exit if at least one bad note name is given
-try:
-    chord = check_chord(chord)
-except NameError as e:
-    print('''"{}" is not a valid note name
-    Authorized note names are:
-    C D E F G A B
-    Accidentals are:
-     # (sharp/dieze)
-     b (flat/bemol)
-     x (## double sharp / double dieze)
-     bb (double flat / double bemol)
-    e.g: "C Eb Gb Bbb"'''.format(str(e)), file=sys.stderr)
-    sys.exit(1)
-
-
-svg_open()
-svg_draw_chord(chord, chordname)
-svg_close()
-
+# read standard input (stream mode) only if no chord
+# are present in chords list
 # stream mode means read input stream until EOF is reached and
 # draw one chord for each line.
 # line should be of the following form:
 # C E G;C major
 # i.e: 2 parts: chord;chordname
-## TODO: make stream mode be more unix feel, i.e: -s not required
+if not chords:
+    try:
+        for line in sys.stdin:
+            # remove trailing '\n'
+            line = ' '.join(line.split())
 
-if stream_mode:
-    for line in sys.stdin:
-        # forward options
-        export_option = ''
-        if export:
-            export_option = ' --export'
+            # ignore commented or empty lines
+            if line[0:1] == '#' or line == '':
+                continue
 
-        keyprint_option = ''
-        if keyprint:
-            keyprint_option = ' --keyprint'
-
-        chord_parts = line.split(';')
-        if len(chord_parts) > 0:
-            chord_option = chord_parts[0]
-        else:
-            next
-
-        if len(chord_parts) > 1:
-            # join used to remove trailing \n
-            chordname_option = ''.join(chord_parts[1].split())
-        else:
-            chordname_option = '-'.join(chord_option.split())
-            # first letter uppercase
-            chordname_option = chordname_option.title()
-
-        cmdline = sys.argv[0] + ' --chord "' + chord_option + '" --title "' + chordname_option + '"' + export_option + keyprint_option
-
-        # call chords script in normal mode
-        subprocess.call(cmdline, shell = True)
-
-    sys.exit(0)
+            # add line chord[;title] to chords list
+            chords.append(line)
+    except KeyboardInterrupt:
+        print()     # for a clean CLI exit
+        sys.exit(2)
 
 
-# not in stream mode
-svg_name = ''
+# chords is not empty if we reach this point
+index = 0
+for line in chords:
 
-# filename is given, first assume it is for svg output
-if filename != '':
-    svg_name = set_extension(filename, ".svg")
+    # extract chord and title
+    parts = line.split(';')
 
-# export to png
-if export:
-    # export_cmd is a full svg to png shell command expression
-    # made from EXPORT_CMD content
-    export_cmd = export_cmd_expr()
+    # store chord in a list of notes
+    chord = parts[0]
+    chord = chord.capitalize().split()   # first letter uppercase
 
-    ext = ".png"
-    export_fname = set_extension(TMP_FILENAME, ext)
-    if filename != '':
-        export_fname = set_extension(filename, ext)
-    elif chordname != '':
-        export_fname = set_extension(sanitize(chordname), ext)
-    elif len(chord) > 0:
-        export_fname = set_extension(sanitize('-'.join(chord_input.split())), ext)
+    # if chord empty then reset key print space
+    # else set user defined choice from --keyprint
+    h_kprint = height_keyprint
+    if not chord:
+        h_kprint = 0
 
-    if svg_name == '':
-        svg_name = set_extension(export_fname, ".svg")
+    # store title
+    title = ''
+    if len(parts) > 1:
+        title = parts[1]
+        if title == r'\\':
+            title = ' '
 
+    # exit if at least one bad note name is given
+    try:
+        chord = check_chord(chord)
+    except NameError as e:
+        print('''
+Error: "{}" is not a valid input
+  - Authorized note names are:
+    C D E F G A B
+  - Accidentals are:
+    # (sharp/dieze)
+    b (flat/bemol)
+    x (## double sharp / double dieze)
+    bb (double flat / double bemol)
 
-# automatically write to stdout or
-# to a file depending on --export option
-if export or filename != '':
-    # OUTPUT default is sys.stdout
-    OUTPUT = open(svg_name, 'w')
+  e.g: "C Eb Gb Bbb;Cdim7" "C E G;C major"
 
-# first export to svg
-svg_open()
-svg_draw_chord(chord, chordname)
-svg_close()
+  Try --help for more info
+        '''.format(str(e)), file=sys.stderr)
+        sys.exit(1)
 
-OUTPUT.close()
-
-# export svg to png bitmap
-if export:
-    if export_cmd != '':
-        # export_cmd expression must contain exactely 2 pairs of empty
-        # braces ...{}...{}... to be filled with svg_name and export_fname
-        subprocess.call(export_cmd.format(svg_name, export_fname), shell=True)
+    # make output file name
+    if title and title != ' ':
+        svgname = fileprefix + title + '_' + str(index)
     else:
-        print("No export command found in " + str(EXPORT_CMD.keys()),
-              file=sys.stderr)
+        svgname = fileprefix + str(index)
+
+    svgname = set_extension(sanitize(svgname), '.svg')
+
+    # OUTPUT default is sys.stdout
+    OUTPUT = open(svgname, 'w')
+
+    svg_open(title, h_kprint)
+    svg_draw_chord(chord, title)
+    svg_close()
+
+    OUTPUT.close()
+
+    # export to PNG if --export == True
+    if export:
+        # set export command depending on what's installed on system
+        export_cmd = export_cmd_expr()
+        pngname = set_extension(svgname, '.png')
+
+        if export_cmd != '':
+            # export_cmd expression must contain exactely 2 pairs of empty
+            # braces ...{}...{}... to be filled with svg_name and export_fname
+            subprocess.call(export_cmd.format(svgname, pngname), shell=True)
+        else:
+            print("No export command found in " + str(EXPORT_CMD.keys()),
+                  file=sys.stderr)
+
+    # next chord
+    index = index + 1
 
 sys.exit(0)
+
+################################################################
