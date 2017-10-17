@@ -258,7 +258,7 @@ def args():
 
     # store provided chords in chords list
     for chord in args.chords:
-        chords.append(chord.capitalize())
+        chords.append(chord)
 
     # store keyprint choice, if true set height of note name space
     keyprint = args.keyprint
@@ -459,9 +459,9 @@ def svg_draw_keyname(octave_shift, notename):
 
 ###############################################
 # draw chord name as svg text
-def svg_draw_title(label):
+def svg_draw_title(title):
     y = 14 * zoom
-    x = ((140 - (len(label) * 8)) / 2) * zoom
+    x = ((140 - (len(title) * 8)) / 2) * zoom
     font_size = zoom
     line_height = 1.25 * zoom
     svg_title = '''  <text
@@ -473,12 +473,12 @@ def svg_draw_title(label):
        id="tspanTITLE">{}</tspan>
   </text>'''
 
-    print(svg_title.format(sanitize(label),
+    print(svg_title.format(title,
                            y,
                            x,
                            font_size,
                            line_height,
-                           label),
+                           title),
                            file=OUTPUT)
 
 ###############################################
@@ -603,6 +603,8 @@ for line in chords:
     # extract chord and title
     parts = line.split(';')
 
+    print(str(parts))
+
     # store chord in a list of notes
     chord = parts[0]
     chord = chord.capitalize().split()   # first letter uppercase
@@ -619,6 +621,8 @@ for line in chords:
         title = parts[1]
         if title == r'\\':
             title = ' '
+
+    print('title = ' + title)
 
     # exit if at least one bad note name is given
     try:
