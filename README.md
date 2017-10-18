@@ -167,10 +167,10 @@ Bb Db F;Bbm
 B D F#;Bm
 ```
 
-To generate the drawings of each chords with keyprint and export option, we use the following command:
+To generate the drawings of each chords with --keyprint, --export and --zoom 2.0 options, we use the following command:
 
 ```
-showchord -e -k < minor-chords-1.txt
+showchord -e -k -z 2 < minor-chords-1.txt
 ```
 
 And we obtain the following result stored in SVG and PNG files:
