@@ -1,7 +1,7 @@
 # showchord
 Show chords on a piano keyboard to see how to play it.
 
-![cdim7.png](examples/cdim7.png)
+![zoom_3_Cdim7_0.png](examples/zoom_3_Cdim7_0.png)
 
 ## Motivation
 As you play keyboard by auto-learning and do not have enough music theory skills to read scores, you may need to draw chord as marks on a keyboard to see how to play it. Showchord is a program to help doing that. It renders chord drawings as SVG and PNG images.
