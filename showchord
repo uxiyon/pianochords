@@ -603,8 +603,6 @@ for line in chords:
     # extract chord and title
     parts = line.split(';')
 
-    print(str(parts))
-
     # store chord in a list of notes
     chord = parts[0]
     chord = chord.capitalize().split()   # first letter uppercase
@@ -621,8 +619,6 @@ for line in chords:
         title = parts[1]
         if title == r'\\':
             title = ' '
-
-    print('title = ' + title)
 
     # exit if at least one bad note name is given
     try:
