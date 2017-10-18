@@ -13,13 +13,38 @@ The chord name may be provided to be printed above the keyboard
 Note names may be printed below the keyboard
 
 Synopsis:
-showchord  [[--stream] | [--chord "C E G B"] [--chordname "C MAJ7"]]
-            [--printkey]
-            [--export]
-            [--zoom]
-            [--file <filename>]
+showchord [-h] [--keyprint] [--fileprefix FILEPREFIX] [--export]
+                 [--zoom ZOOM] ['C E G B;Cmaj7' '' 'a c# e g#;Amaj7']
 
-if nothing is given, then only draw a 2 octaves keyboard
+Three examples giving the same result:
+
+# chords given at command line
+showchord -k -e -z 3 'C E G B;Cmaj7' '' 'a c# e g#;Amaj7'
+
+# chords given from a pipe stream
+echo 'C E G B;Cmaj7' '' 'a c# e g#;Amaj7' | showchord -k -e -z 3
+
+# chords provided from a file stream
+cat >chords.lst<<EOF
+C E G B;Cmaj7
+
+a c# e g#;Amaj7
+EOF
+
+showchord -k -e -z 3 < chords.lst
+
+$ showchord -e -k -z 3
+'C E G;C'
+'a c# e g#;Amaj7'
+''
+';Dmin7'
+^C
+
+if no chord is given, then switches to stream mode and waits for 
+input from stdin
+
+NOTE: chords as arguments override any stream input, i.e: stream
+input is switched on only if no chord is provided as arguments
 
 requirements:
  linux like OS
@@ -27,22 +52,14 @@ requirements:
  inkscape 0.92+ (export function)
 ##################################################################'''
 
-##################################################################
-# TODO:
-# - provide main chords
-# - if more than one chord is provided, organize them in an array
-# - allow to give a title to the page
-# - allow to export to pdf
-##################################################################
-
 ## module import
 
 # required to use print(string, file=sys.stdout) in python 2
 from __future__ import print_function
 
 import os, sys, subprocess
-from collections import namedtuple
 import argparse
+from collections import namedtuple
 
 ## constants
 WTE_WIDTH = 10
@@ -52,7 +69,6 @@ WTE_COLOR = "#ffffff"
 WTE_OPACITY = 1
 WTE_TYPE = 0
 WTE_MARK_V_OFFSET = (3.2 * WTE_WIDTH)
-#WTE_MARK_COLOR = "#00c000"
 WTE_MARK_COLOR = "#000000"
 
 BLK_SHIFT = 1     # specific black key shift value
@@ -63,12 +79,10 @@ BLK_COLOR = "#000000"
 BLK_OPACITY = 1
 BLK_TYPE = 1
 BLK_MARK_V_OFFSET = (2.7 * BLK_WIDTH)
-#BLK_MARK_COLOR = "#00c000"
 BLK_MARK_COLOR = "#ffffff"
 
 
 OUTPUT = sys.stdout
-TMP_FILENAME = "new_chord"
 SVG_ID = "chords"
 HEIGHT_TITLE = 20
 HEIGHT_PRINTKEY = 15
@@ -81,24 +95,79 @@ EXPORT_CMD = {'inkscape': ' -D -f {} -e {} >/dev/null',
 export_cmd = ''
 
 ## variables fed from arguments
-chord = []
-chord_input = ''
-chordname = ''
-printkey = False
+
+# list of chords of the forme 'N N N N;Chord Name'
+chords = []
+
+# print note name under marked key
+keyprint = False
+
+# export to PNG
 export = False
-stream_mode = False
-filename = ''
-header_printed = False
+
+# file prefix to compose output file
+fileprefix = 'chord_'
+
+# free space above keyboard to print title
 height_title = 0
-height_printkey = 0
+
+# free space below keyboard to print note names
+height_keyprint = 0
+
+# zoom value
 zoom = 1
+
+# 35 representable notes on a single scale with
+# their index on the scale
+NOTES = {'Cbb' : 10,
+         'Cb': 11,
+         'C' : 0,
+         'C#': 1,
+         'Cx': 2,
+         'Dbb': 0,
+         'Db': 1,
+         'D' : 2,
+         'D#' : 3,
+         'Dx' : 4,
+         'Ebb': 2,
+         'Eb': 3,
+         'E': 4,
+         'E#': 5,
+         'Ex': 6,
+         'Fbb': 3,
+         'Fb': 4,
+         'F': 5,
+         'F#': 6,
+         'Fx': 7,
+         'Gbb': 5,
+         'Gb': 6,
+         'G': 7,
+         'G#': 8,
+         'Gx': 9,
+         'Abb': 7,
+         'Ab': 8,
+         'A': 9,
+         'A#': 10,
+         'Ax': 11,
+         'Bbb': 9,
+         'Bb': 10,
+         'B': 11,
+         'B#': 0,
+         'Bx': 1}
 
 ###########################
 # define a note representation
-Key = namedtuple('Key', ['name', 'index', 'h_offset', 'h_shift', 'type'])
+
+# key dimensions
 KeyDim = namedtuple('KeyDim', ['width', 'height'])
+
+# key appearence
 KeyApp = namedtuple('KeyApp', ['color'])
+
+# key mark spec
 KeyMark = namedtuple('KeyMark', ['color', 'v_offset'])
+
+# key type (black or white)
 KeyType = namedtuple('NteType', ['h_init_offset', 'dim', 'app', 'mark'])
 
 # 2 types of keys
@@ -114,59 +183,30 @@ blk_app = KeyApp(BLK_COLOR)
 blk_mark = KeyMark(BLK_MARK_COLOR, BLK_MARK_V_OFFSET)
 black = KeyType(BLK_INIT_OFFSET, blk_dim, blk_app, blk_mark)
 
-# define all 12 notes
-C_sflat  = Key('Cbb', 11, 5, 1, black)
-C_flat  = Key('Cb', 12, 6, 0, white)
-C       = Key('C', 1, 0, 0, white)
-C_sharp = Key('C#', 2, 0, -1, black)
-C_ssharp = Key('Cx', 3, 1, 0, white)
+# note lists for drawing keyboard as in SVG black keys
+# must be after to override white keys
+WHITES = ['C', 'D', 'E', 'F', 'G', 'A', 'B']
+BLACKS = ['C#', 'D#', 'F#', 'G#', 'A#']
 
-D_sflat  = Key('Dbb', 1, 0, 1, white)
-D_flat  = Key('Db', 2, 0, -1, black)
-D       = Key('D', 3, 1, 0, white)
-D_sharp = Key('D#', 4, 1, 1, black)
-D_ssharp = Key('Dx', 5, 2, 0, white)
-
-E_sflat  = Key('Ebb', 3, 1, 0, white)
-E_flat  = Key('Eb', 4, 1, 1, black)
-E       = Key('E', 5, 2, 0, white)
-E_sharp = Key('E#', 6, 3, 0, white)
-E_ssharp = Key('Ex', 7, 3, -1, black)
-
-F_sflat  = Key('Fbb', 4, 1, 1, black)
-F_flat  = Key('Fb', 5, 2, 0, white)
-F       = Key('F', 6, 3, 0, white)
-F_sharp = Key('F#', 7, 3, -1, black)
-F_ssharp = Key('Fx', 8, 4, 0, white)
-
-G_sflat  = Key('Gbb', 6, 3, 0, white)
-G_flat  = Key('Gb', 7, 3, -1, black)
-G       = Key('G', 8, 4, 0, white)
-G_sharp = Key('G#', 9, 4, 0, black)
-G_ssharp = Key('Gx', 10, 5, 0, white)
-
-A_sflat  = Key('Abb', 8, 4, 0, white)
-A_flat  = Key('Ab', 9, 4, 0, black)
-A       = Key('A', 10, 5, 0, white)
-A_sharp = Key('A#', 11, 5, 1, black)
-A_ssharp = Key('Ax', 12, 6, 0, white)
-
-B_sflat  = Key('Bbb', 10, 5, 0, white)
-B_flat  = Key('Bb', 11, 5, 1, black)
-B       = Key('B', 12, 6, 0, white)
-B_sharp = Key('B#', 1, 0, 0, white)
-B_ssharp = Key('Bx', 2, 0, -1, black)
-
-# all 12 notes ordered to be drawn in svg
-# the order is important for the black to overlap whites
-TWELVE = [C, D, E, F, G, A, B, B_sharp, C_sharp, D_sharp, E_sharp, F_sharp, G_sharp, A_sharp]
-
-ALL_NOTES = [C, D, E, F, G, A, B,
-             C_sharp, D_sharp, E_sharp, F_sharp, G_sharp, A_sharp, B_sharp,
-             C_flat, D_flat, E_flat, F_flat, G_flat, A_flat, B_flat,
-             C_sflat, D_sflat, E_sflat, F_sflat, G_sflat, A_sflat, B_sflat,
-             C_ssharp, D_ssharp, E_ssharp, F_ssharp, G_ssharp, A_ssharp, B_ssharp]
-
+# 12 notes representation by id, ordered from their 
+# position on the piano keyboard
+# the implicite id is the link between NOTES and NOTES_REPR
+# First value is white note index
+# Second value is shift direction -1:left, 0:center, 1:right
+# white or black are structure containing drawing information
+NOTES_REPR = []
+NOTES_REPR.append([0, 0, white])	# 0  : C
+NOTES_REPR.append([0, -1, black])       # 1  : C#
+NOTES_REPR.append([1, 0, white]) 	# 2  : D
+NOTES_REPR.append([1, 1, black])	# 3  : D#
+NOTES_REPR.append([2, 0, white])	# 4  : E
+NOTES_REPR.append([3, 0, white])	# 5  : F
+NOTES_REPR.append([3, -1, black])	# 6  : F#
+NOTES_REPR.append([4, 0, white])	# 7  : G
+NOTES_REPR.append([4, 0, black])	# 8  : G#
+NOTES_REPR.append([5, 0, white])	# 9  : A
+NOTES_REPR.append([5, 1, black])	# 10 : A#
+NOTES_REPR.append([6, 0, white])	# 11 : B
 
 ###############################################
 # functions
@@ -175,61 +215,69 @@ ALL_NOTES = [C, D, E, F, G, A, B,
 ###############################################
 # command line arguments
 def args():
-    global chord
-    global chord_input
-    global chordname
-    global height_title
-    global printkey
-    global height_printkey
+    global chords
+    global keyprint
+    global height_keyprint
     global export
-    global filename
-    global stream_mode
+    global fileprefix
     global zoom
 
-    parser = argparse.ArgumentParser(description='Print chords on a piano keyboard')
+    parser = argparse.ArgumentParser(description='Show chord notes on a piano keyboard')
 
-    # WARNING: default apply only if argument is *not* given
-    parser.add_argument('--chord', '-c', action='store', help='Notes of the chord - ex. "C Eb Gb Bbb"')
-    parser.add_argument('--chordname', '-n', action='store', help='Chord name shown above the keyboard')
-    parser.add_argument('--printkey', '-p', action='store_true', help='Print chord key names')
-    parser.add_argument('--filename', '-f', action='store', help='File name to store chord drawing')
-    parser.add_argument('--export', '-e', action='store_true', help='Export to PNG file')
-    parser.add_argument('--zoom', '-z', type=float, action='store', help='Zoom value (float), e.g: 2.0 to double output SVG drawing size')
-    parser.add_argument('--stream', '-s', action='store_true', help='Switch to stream mode')
+    # optional list of chords
+    # if no chord provided then enter in stream mode
+    # chords is a list of chords of the form 'N N N;chord title'
+    # ex: 'D F# A;D major' 'e g# B;E' 'E A b c'
+    parser.add_argument('chords',
+	nargs='*',
+	help='Notes of the chord, followed or not by chord name - ex. "C Eb Gb Bbb;Cdim7" "C E G"')
 
+    # print note name below each marked key
+    parser.add_argument('--keyprint', '-k',
+	action='store_true',
+	help='Print note key names below the keyboard')
+
+    # set prefix for automatic file name
+    parser.add_argument('--fileprefix', '-f',
+	action='store',
+	help='File prefix to auto-generated filenames to store chord images')
+
+    # export to PNG image file format
+    parser.add_argument('--export', '-e',
+	action='store_true',
+	help='Export to PNG file')
+
+    # zoom output SVG image (and PNG if --export is set)
+    parser.add_argument('--zoom', '-z',
+	type=float,
+	action='store',
+	help='Zoom value (float), e.g: 2.0 to double output SVG drawing size')
+
+    # parse command line and set args.<option> values
     args = parser.parse_args()
 
-    # chord is a list of notes
-    if args.chord:
-        chord_input = args.chord.title()
-        chord = chord_input.split()
+    # store provided chords in chords list
+    for chord in args.chords:
+        chords.append(chord)
 
-    # chord name
-    if args.chordname:
-        chordname = args.chordname
-        height_title = HEIGHT_TITLE
+    # store keyprint choice, if true set height of note name space
+    keyprint = args.keyprint
+    if keyprint:
+        height_keyprint = HEIGHT_PRINTKEY
 
-    # print chord key names
-    printkey = args.printkey
-    if printkey:
-        height_printkey = HEIGHT_PRINTKEY
+    # override default fileprefix
+    if args.fileprefix:
+        fileprefix = args.fileprefix
 
-    # file name to store chord drawing
-    if args.filename:
-        filename = args.filename
-
-    # export to bitmap
+    # store export choice
     export = args.export
 
-    # zoom factor
+    # store zoom factor
     if args.zoom:
         zoom = args.zoom
 
-    # stream mode
-    stream_mode = args.stream
-
 ###############################################
-# check if cmd exists and is executable on OS
+# check if external cmd exists and is executable on OS
 # return command full name on success
 # or empty string on failed search
 def export_cmd_fullname(cmd):
@@ -257,7 +305,7 @@ def export_cmd_expr():
 
 ###############################################
 # print begining of svg file
-def svg_open():
+def svg_open(title, height_kprint):
     svg_header = '''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
@@ -286,12 +334,14 @@ def svg_open():
     </rdf:RDF>
   </metadata>'''
 
+    height = HEIGHT_TITLE
+    if title == '': height = 0
     vbox_x = 0
     vbox_y = 0
-    vbox_width = 141 * zoom
-    vbox_heigth = (30 + height_title) * zoom
-    width = 141 * zoom
-    height = (42 + height_title + height_printkey) * zoom
+    vbox_width = 142 * zoom
+    vbox_heigth = (30 + height) * zoom
+    width = 142 * zoom
+    height = (42 + height + height_kprint) * zoom
     print(svg_header.format(vbox_x,
                             vbox_y,
                             vbox_width,
@@ -302,12 +352,12 @@ def svg_open():
 
 ###############################################
 # print svg group open
-def svg_g_open(cho_name):
-    x_translate = 0
-    y_translate = 0
-    if cho_name != '':
+def svg_g_open(title):
+    x_translate = 1
+    y_translate = 1
+    if title != '':
         y_translate = CHORD_Y_SHIFT * zoom
-        svg_draw_title(cho_name)
+        svg_draw_title(title)
 
     svg_group = '''  <g
     transform="translate({},{})"
@@ -315,7 +365,7 @@ def svg_g_open(cho_name):
 
     print(svg_group.format(x_translate,
                            y_translate,
-                           cho_name),
+                           title),
                            file=OUTPUT)
 
 ###############################################
@@ -330,8 +380,12 @@ def svg_close():
 
 ###############################################
 # draw the given key as svg rectangle
-def svg_draw_key(octave_shift, key):
-    x = octave_shift + ((key.h_offset * WTE_WIDTH) + key.type.h_init_offset) * zoom
+def svg_draw_key(octave_shift, notename):
+
+    # retrieve key structure from notename
+    key = NOTES_REPR[NOTES[notename]]
+
+    x = octave_shift + ((key[0] * WTE_WIDTH) + key[2].h_init_offset) * zoom
     y = 0
     svg_key = '''    <rect
     id="{}"
@@ -341,20 +395,24 @@ def svg_draw_key(octave_shift, key):
     y="{}"
     style="fill:{};fill-opacity:1;stroke:#000000;stroke-width:1;stroke-opacity:1"
     />'''
-    print(svg_key.format(key.index,
-                         key.type.dim.width * zoom,
-                         key.type.dim.height * zoom,
+    print(svg_key.format(key,
+                         key[2].dim.width * zoom,
+                         key[2].dim.height * zoom,
                          x,
                          y,
-                         key.type.app.color),
+                         key[2].app.color),
                          file=OUTPUT)
 
 ##############################################
 # draw a mark on the given note as svg circle
-def svg_draw_mark(octave_shift, key):
+def svg_draw_mark(octave_shift, notename):
+
+    # retrieve key structure from notename
+    key = NOTES_REPR[NOTES[notename]]
+
     r_value = MARK_RADIUS * zoom
-    cx = octave_shift + ((key.h_offset * WTE_WIDTH + (WTE_WIDTH / 2)) + key.type.h_init_offset * 0.7) * zoom
-    cy = key.type.mark.v_offset * zoom
+    cx = octave_shift + ((key[0] * WTE_WIDTH + (WTE_WIDTH / 2)) + key[2].h_init_offset * 0.7) * zoom
+    cy = key[2].mark.v_offset * zoom
     svg_mark = '''  <circle
   id="path{}"
   r="{}"
@@ -363,19 +421,24 @@ def svg_draw_mark(octave_shift, key):
   style="fill:{};fill-opacity:1;stroke-width:0.38909313"
   />'''
 
-    print(svg_mark.format(key.index,
+    print(svg_mark.format(key,
                           r_value,
                           cx,
                           cy,
-                          key.type.mark.color),
+                          key[2].mark.color),
                           file=OUTPUT)
 
 ###############################################
-def svg_draw_keyname(octave_shift, key):
-    x = octave_shift + ((key.h_offset * WTE_WIDTH + (WTE_WIDTH * 0.25)) + key.type.h_init_offset * 0.5) * zoom
-    y = (key.type.mark.v_offset * 1.6 + (key.type.h_init_offset * 2.8)) * zoom
+def svg_draw_keyname(octave_shift, notename):
+
+    # retrieve key structure from notename
+    key = NOTES_REPR[NOTES[notename]]
+
     font_size = 0.5 * zoom
+    x = octave_shift + ((key[0] * WTE_WIDTH + ((WTE_WIDTH - len(notename) * (font_size + 1)) / 2) + key[2].h_init_offset * 0.5)) * zoom
+    y = (key[2].mark.v_offset * 1.6 + (key[2].h_init_offset * 2.8)) * zoom
     line_height = 1.25 * zoom
+    line_height = font_size * zoom
 
     keyname = '''  <text
      id="key_{}"
@@ -385,20 +448,20 @@ def svg_draw_keyname(octave_shift, key):
      xml:space="preserve"><tspan
        id="tspan_{}">{}</tspan>
   </text>'''
-    print(keyname.format(key.name.title(),
+    print(keyname.format(notename,
                          y,
                          x,
                          font_size,
                          line_height,
-                         key.name.title(),
-                         key.name.title()),
+                         notename,
+                         notename),
                          file=OUTPUT)
 
 ###############################################
 # draw chord name as svg text
-def svg_draw_title(label):
+def svg_draw_title(title):
     y = 14 * zoom
-    x = ((140 - (len(label) * 6)) / 2) * zoom
+    x = ((140 - (len(title) * 8)) / 2) * zoom
     font_size = zoom
     line_height = 1.25 * zoom
     svg_title = '''  <text
@@ -410,78 +473,84 @@ def svg_draw_title(label):
        id="tspanTITLE">{}</tspan>
   </text>'''
 
-    print(svg_title.format(sanitize(label),
+    print(svg_title.format(title,
                            y,
                            x,
                            font_size,
                            line_height,
-                           label),
+                           title),
                            file=OUTPUT)
 
 ###############################################
 # draw a 2 octaves keyboard
-def draw_svg_kbd(cho_name):
-    svg_g_open(cho_name)
+def draw_svg_kbd():
 
     o_shift = 0
     # draw notes of 2 octaves
     for octv in range(0,2):
         o_shift = (octv * 7 * WTE_WIDTH * zoom)
-        for nte in TWELVE:
-            svg_draw_key(o_shift, nte)
+        for note in WHITES:
+            svg_draw_key(o_shift, note)
 
+        for note in BLACKS:
+            svg_draw_key(o_shift, note)
 
 ###############################################
 def svg_draw_chord(ch, ch_name):
 
+    svg_g_open(ch_name)
+
     # draw keyboard on 2 octaves
-    draw_svg_kbd(ch_name)
+    draw_svg_kbd()
 
     ## draw a mark on the keys of the given chord
-    #  and the note name if printkey is set
+    #  and the note name if keyprint is set
+
+    if not ch:
+        svg_g_close()
+        return 0
+
     octv_shift = 0
     key_idx = 0
 
     for note in ch:
-        k = next(key for key in ALL_NOTES if key.name == note.title())
-        if k.index < key_idx:
+        k_idx = NOTES[note]
+        if k_idx < key_idx:
             octv_shift = (7 * WTE_WIDTH * zoom)
-        svg_draw_mark(octv_shift, k)
-        if printkey:
-            svg_draw_keyname(octv_shift, k)
-        key_idx = k.index
+        svg_draw_mark(octv_shift, note)
+        if keyprint:
+            svg_draw_keyname(octv_shift, note)
+        key_idx = k_idx
 
     svg_g_close()
+    return 0
 
 ###############################################
 # check if all note names in given chord are correct
-# else raise a NameError exception returning bad note name
+# else raise a NameError exception that returns the bad note name
 def check_chord(ch):
-    sanit_chord = []
-
+    cleaned_chord = []
     for note in ch:
-        try:
-            k = next(key for key in ALL_NOTES if key.name == note.title())
-            sanit_chord.append(note.title())
-
-        # note not found
-        except StopIteration:
+        if note.capitalize() in NOTES:
+            cleaned_chord.append(note.capitalize())
+        else:
+            # note not found
             raise NameError(note)
 
-    return sanit_chord
+    return cleaned_chord
 
 ###############################################
+# cleanup name to be OS compatible
 def sanitize(name):
-    tmp = name.replace(" ", "_")
-    tmp = tmp.replace("#","sharp")
-    tmp = tmp.replace("b","flat")
+    tmp = name.replace("_ ", "_")
+    tmp = tmp.replace(" ", "_")
+    tmp = tmp.replace("#","s")
     return tmp
 
 ###############################################
 # add or replace filename extension
 # return name with the given extension
 def set_extension(name, ext):
-
     if name == '':
         return name
 
@@ -496,109 +565,115 @@ def set_extension(name, ext):
     return '.'.join(tmplist) + ext
 
 ###############################################
-## main
+# main ########################################
+###############################################
 
 # get script options and arguments
+# this may provide chords in chords list
 args()
 
-# exit if at least one bad note name is given
-try:
-    chord = check_chord(chord)
-except NameError as e:
-    print('''"{}" is not a valid note name
-    Authorized note names are:
-    C D E F G A B
-    Accidentals are # and b
-    e.g: "C Eb G#"'''.format(str(e)), file=sys.stderr)
-    sys.exit(1)
-
+# read standard input (stream mode) only if no chord
+# are present in chords list
 # stream mode means read input stream until EOF is reached and
 # draw one chord for each line.
 # line should be of the following form:
 # C E G;C major
 # i.e: 2 parts: chord;chordname
+if not chords:
+    try:
+        for line in sys.stdin:
+            # remove trailing '\n'
+            line = ' '.join(line.split())
 
-if stream_mode:
-    for line in sys.stdin:
-        # forward options
-        export_option = ''
-        if export:
-            export_option = ' --export'
+            # ignore commented or empty lines
+            if line[0:1] == '#' or line == '':
+                continue
 
-        printkey_option = ''
-        if printkey:
-            printkey_option = ' --printkey'
-
-        chord_parts = line.split(';')
-        if len(chord_parts) > 0:
-            chord_option = chord_parts[0]
-        else:
-            next
-
-        if len(chord_parts) > 1:
-            # join used to remove trailing \n
-            chordname_option = ''.join(chord_parts[1].split())
-        else:
-            chordname_option = '-'.join(chord_option.split())
-            # first letter uppercase
-            chordname_option = chordname_option.title()
-
-        cmdline = sys.argv[0] + ' --chord "' + chord_option + '" --chordname "' + chordname_option + '"' + export_option + printkey_option
-
-        # call chords script in normal mode
-        subprocess.call(cmdline, shell = True)
-
-    sys.exit(0)
+            # add line chord[;title] to chords list
+            chords.append(line)
+    except KeyboardInterrupt:
+        print()     # for a clean CLI exit
+        sys.exit(2)
 
 
-# not in stream mode
-svg_name = ''
+# chords is not empty if we reach this point
+index = 0
+for line in chords:
 
-# filename is given, first assume it is for svg output
-if filename != '':
-    svg_name = set_extension(filename, ".svg")
+    # extract chord and title
+    parts = line.split(';')
 
-# export to png
-if export:
-    # export_cmd is a full svg to png shell command expression
-    # made from EXPORT_CMD content
-    export_cmd = export_cmd_expr()
+    # store chord in a list of notes
+    chord = parts[0]
+    chord = chord.capitalize().split()   # first letter uppercase
 
-    ext = ".png"
-    export_fname = set_extension(TMP_FILENAME, ext)
-    if filename != '':
-        export_fname = set_extension(filename, ext)
-    elif chordname != '':
-        export_fname = set_extension(sanitize(chordname), ext)
-    elif len(chord) > 0:
-        export_fname = set_extension(sanitize('-'.join(chord_input.split())), ext)
+    # if chord empty then reset key print space
+    # else set user defined choice from --keyprint
+    h_kprint = height_keyprint
+    if not chord:
+        h_kprint = 0
 
-    if svg_name == '':
-        svg_name = set_extension(export_fname, ".svg")
+    # store title
+    title = ''
+    if len(parts) > 1:
+        title = parts[1]
+        if title == r'\\':
+            title = ' '
 
+    # exit if at least one bad note name is given
+    try:
+        chord = check_chord(chord)
+    except NameError as e:
+        print('''
+Error: "{}" is not a valid input
+  - Authorized note names are:
+    C D E F G A B
+  - Accidentals are:
+    # (sharp/dieze)
+    b (flat/bemol)
+    x (## double sharp / double dieze)
+    bb (double flat / double bemol)
 
+  e.g: "C Eb Gb Bbb;Cdim7" "C E G;C major"
 
-# automatically write to stdout or
-# to a file depending on --export option
-if export or filename != '':
-    # OUTPUT default is sys.stdout
-    OUTPUT = open(svg_name, 'w')
+  Try --help for more info
+        '''.format(str(e)), file=sys.stderr)
+        sys.exit(1)
 
-# first export to svg
-svg_open()
-svg_draw_chord(chord, chordname)
-svg_close()
-
-OUTPUT.close()
-
-# export svg to png bitmap
-if export:
-    if export_cmd != '':
-        # export_cmd expression must contain exactely 2 pairs of empty
-        # braces ...{}...{}... to be filled with svg_name and export_fname
-        subprocess.call(export_cmd.format(svg_name, export_fname), shell=True)
+    # make output file name
+    if title and title != ' ':
+        svgname = fileprefix + title + '_' + str(index)
     else:
-        print("No export command found in " + str(EXPORT_CMD.keys()),
-              file=sys.stderr)
+        svgname = fileprefix + str(index)
+
+    svgname = set_extension(sanitize(svgname), '.svg')
+
+    # OUTPUT default is sys.stdout
+    OUTPUT = open(svgname, 'w')
+
+    svg_open(title, h_kprint)
+    svg_draw_chord(chord, title)
+    svg_close()
+
+    OUTPUT.close()
+
+    # export to PNG if --export == True
+    if export:
+        # set export command depending on what's installed on system
+        export_cmd = export_cmd_expr()
+        pngname = set_extension(svgname, '.png')
+
+        if export_cmd != '':
+            # export_cmd expression must contain exactely 2 pairs of empty
+            # braces ...{}...{}... to be filled with svg_name and export_fname
+            subprocess.call(export_cmd.format(svgname, pngname), shell=True)
+        else:
+            print("No export command found in " + str(EXPORT_CMD.keys()),
+                  file=sys.stderr)
+
+    # next chord
+    index = index + 1
 
 sys.exit(0)
+
+################################################################
