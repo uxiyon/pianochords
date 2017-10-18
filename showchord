@@ -583,7 +583,7 @@ if not chords:
     try:
         for line in sys.stdin:
             # remove trailing '\n'
-            line = ' '.join(line.split())
+            line = line.replace('\n', '')
 
             # ignore commented or empty lines
             if line[0:1] == '#' or line == '':
