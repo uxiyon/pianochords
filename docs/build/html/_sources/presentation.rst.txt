@@ -1,0 +1,6 @@
+Presentation
+========================
+
+This is a short presentation of showchord.
+
+Showchord is a tool to provide images of chords on a piano keyboard.

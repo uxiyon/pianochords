@@ -1,0 +1,368 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Examples &mdash; showchord v0.7.0</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.png"/>
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="showchord v0.7.0" href="index.html"/>
+        <link rel="next" title="Documentation" href="documentation.html"/>
+        <link rel="prev" title="Features" href="features.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> showchord
+          
+
+          
+            
+            <img src="_static/logo.png" class="logo" />
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="features.html">Features</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#preamble">Preamble</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#basic">Basic</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#change-fileprefix">Change fileprefix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#export-to-png">Export to PNG</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#chord-title">Chord title</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#notes-name">Notes name</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#zoom">Zoom</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#stream-input">Stream input</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="documentation.html">Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="test.html">Test page</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">showchord</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Examples</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/examples.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="examples">
+<h1>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="preamble">
+<h2>Preamble<a class="headerlink" href="#preamble" title="Permalink to this headline">¶</a></h2>
+<p>You can visualize SVG files in a modern browser by pointing to the URL <code class="docutils literal"><span class="pre">file:///path-to-my-file/my_svg_file.svg</span></code>. Using the command line may even be faster</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">firefox</span> <span class="n">file</span><span class="p">:</span><span class="o">///</span><span class="n">path</span><span class="o">-</span><span class="n">to</span><span class="o">-</span><span class="n">my</span><span class="o">-</span><span class="n">file</span><span class="o">/</span><span class="n">my_svg_file</span><span class="o">.</span><span class="n">svg</span> <span class="o">&amp;</span>
+</pre></div>
+</div>
+<p>If you have <code class="docutils literal"><span class="pre">inkscape</span></code> installed on your system, you probably have <code class="docutils literal"><span class="pre">inkview</span></code> tool too. Both allow you to view SVG files.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">inkview</span> <span class="n">my_svg_file</span><span class="o">.</span><span class="n">svg</span>         <span class="c1"># view svg file in an X window</span>
+</pre></div>
+</div>
+<p>If you are running Linux, you may also consider using <code class="docutils literal"><span class="pre">librsvg</span></code> and its <code class="docutils literal"><span class="pre">rsvg-view-3</span></code> command line tool.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">rsvg</span><span class="o">-</span><span class="n">view</span><span class="o">-</span><span class="mi">3</span> <span class="n">my_svg_file</span><span class="o">.</span><span class="n">svg</span>     <span class="c1"># view svg file in an X window</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="basic">
+<span id="examples-basic"></span><h2>Basic<a class="headerlink" href="#basic" title="Permalink to this headline">¶</a></h2>
+<p>The most basic usage of showchord is with an empty string as argument. This produces a two scales keyboard without any mark or title.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">showchord</span> <span class="s1">&#39;&#39;</span>
+</pre></div>
+</div>
+<p>The result is the SVG file <a class="reference external" href="_static/examples/chord_0.svg">chord_0.svg</a>: <img alt="chord_0.svg" src="_images/chord_0.svg" /></p>
+<p>Another more common basic usage is with a chord description:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">showchord</span> <span class="s1">&#39;C E G B&#39;</span>
+</pre></div>
+</div>
+<p>As before, that creates an SVG file representing a 2 scales piano keyboard but this time with marks on the keys of the chord notes. The output file has the same automatic name as before (chord_0.svg): <img alt="basic_chord_0.svg" src="_images/basic_chord_0.svg" /></p>
+</div>
+<div class="section" id="change-fileprefix">
+<h2>Change fileprefix<a class="headerlink" href="#change-fileprefix" title="Permalink to this headline">¶</a></h2>
+<p>To change the automatic filename you can choose a specific prefix, use <code class="docutils literal"><span class="pre">--fileprefix</span></code> (<code class="docutils literal"><span class="pre">-f</span></code>) option:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">showchord</span> <span class="s1">&#39;C E G B&#39;</span> <span class="s1">&#39;F A C E&#39;</span> <span class="o">--</span><span class="n">fileprefix</span> <span class="n">maj7_</span>
+</pre></div>
+</div>
+<p>This creates two following SVG files:</p>
+<ul class="simple">
+<li><a class="reference external" href="_static/examples/maj7_0.svg">maj7_0.svg</a>: <img alt="maj7_0.svg" src="_images/maj7_0.svg" /></li>
+<li><a class="reference external" href="_static/examples/maj7_1.svg">maj7_1.svg</a>: <img alt="maj7_1.svg" src="_images/maj7_1.svg" /></li>
+</ul>
+</div>
+<div class="section" id="export-to-png">
+<h2>Export to PNG<a class="headerlink" href="#export-to-png" title="Permalink to this headline">¶</a></h2>
+<p>You may prefer to have bitmap images instead of svg files. For this reason it is possible to export the result SVG file to PNG raster image with the <code class="docutils literal"><span class="pre">--export</span></code> (<code class="docutils literal"><span class="pre">-e</span></code>) option:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">showchord</span> <span class="o">--</span><span class="n">export</span> <span class="s1">&#39;D F# A C&#39;</span> <span class="o">-</span><span class="n">f</span> <span class="n">export_</span>
+</pre></div>
+</div>
+<p>This example produces automatically SVG and PNG files:</p>
+<ul class="simple">
+<li><a class="reference external" href="_static/examples/export_0.svg">export_0.svg</a>: <img alt="export_0.svg" src="_images/export_0.svg" /></li>
+<li><a class="reference external" href="_static/examples/export_0.png">export_0.png</a>: <img alt="export_0.png" src="_images/export_0.png" /></li>
+</ul>
+</div>
+<div class="section" id="chord-title">
+<h2>Chord title<a class="headerlink" href="#chord-title" title="Permalink to this headline">¶</a></h2>
+<p>If you need to name the chord or to show any title above the keyboard, you must provide it directly after the chord description:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">showchord</span> <span class="s1">&#39;F Ab Cb Ebb;Fdim7&#39;</span>
+</pre></div>
+</div>
+<p>This creates the SVG file <a class="reference external" href="_static/examples/chord_Fdim7_0.svg">chord_Fdim7_0.svg</a>: <img alt="chord_Fdim7_0.svg" src="_images/chord_Fdim7_0.svg" /></p>
+</div>
+<div class="section" id="notes-name">
+<h2>Notes name<a class="headerlink" href="#notes-name" title="Permalink to this headline">¶</a></h2>
+<p>To display notes name below the keyboard, use the <code class="docutils literal"><span class="pre">--keyprint</span></code> (<code class="docutils literal"><span class="pre">-k</span></code>) option.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">showchord</span> <span class="s1">&#39;F# A# Cx E#;F# aug M7&#39;</span> <span class="o">-</span><span class="n">f</span> <span class="n">kp_</span> <span class="o">--</span><span class="n">keyprint</span>
+</pre></div>
+</div>
+<p>This creates the SVG file <a class="reference external" href="_static/examples/kp_Fs_aug_M7_0.svg">kp_Fs_aug_M7_0.svg</a>: <img alt="kp_Fs_aug_M7_0.svg" src="_images/kp_Fs_aug_M7_0.svg" /></p>
+</div>
+<div class="section" id="zoom">
+<h2>Zoom<a class="headerlink" href="#zoom" title="Permalink to this headline">¶</a></h2>
+<p>The default size of a chord drawing can be modified with the <code class="docutils literal"><span class="pre">--zoom</span></code> option. This is not very useful with SVG file as svg drawings can be resized without quality loss, but the corresponding bitmap images may look ugly if zoomed with an image viewer. The <code class="docutils literal"><span class="pre">--zoom</span></code> option takes a float number, 1.0 being the default value.</p>
+<p>Let’s try 3 different sizes of the same chord, with zoom values of 0.75, 2.96 and 4.0</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>for i in 0.75 2.96 4 ; do showchord &#39;ab c eb gb;Ab 7&#39; -k -f zm_${i}_ --zoom $i ; done
+</pre></div>
+</div>
+<p>The result images are the following:</p>
+<p><code class="docutils literal"><span class="pre">--zoom</span> <span class="pre">0.75</span></code>: <a class="reference external" href="_static/examples/zm_0.75_Ab_7_0.svg"><img alt="zm_0.75_Ab_7_0.svg" src="_images/zm_0.75_Ab_7_0.svg" /></a></p>
+<p><code class="docutils literal"><span class="pre">--zoom</span> <span class="pre">2.96</span></code>: <a class="reference external" href="_static/examples/zm_2.96_Ab_7_0.svg"><img alt="zm_2.96_Ab_7_0.svg" src="_images/zm_2.96_Ab_7_0.svg" /></a></p>
+<p><code class="docutils literal"><span class="pre">--zoom</span> <span class="pre">4.0</span></code>: <a class="reference external" href="_static/examples/zm_4_Ab_7_0.svg"><img alt="zm_4_Ab_7_0.svg" src="_images/zm_4_Ab_7_0.svg" /></a></p>
+</div>
+<div class="section" id="stream-input">
+<h2>Stream input<a class="headerlink" href="#stream-input" title="Permalink to this headline">¶</a></h2>
+<p>Stream input is the natural mode for providing chords. You can provide as many chords as you like in a single call. However, you may want to prepare many chords in a text file and draw them at once. You can use system redirection to achieve this.</p>
+<div class="admonition caution">
+<p class="first admonition-title">Caution</p>
+<p class="last">You must <strong>not</strong> provide any chords at the command line for input stream to work</p>
+</div>
+<p>A line in the file must be of the form <code class="docutils literal"><span class="pre">chord;chordname</span></code> e.g: <code class="docutils literal"><span class="pre">C</span> <span class="pre">E</span> <span class="pre">G</span> <span class="pre">B;Cmaj7</span></code>.</p>
+<p>Say we have the file <code class="docutils literal"><span class="pre">minor-chords-root.txt</span></code> containing minor chords at root position:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">cat</span> <span class="n">examples</span><span class="o">/</span><span class="n">stream</span><span class="o">/</span><span class="n">minor</span><span class="o">-</span><span class="n">chords</span><span class="o">-</span><span class="n">root</span><span class="o">.</span><span class="n">txt</span>
+ <span class="n">C</span> <span class="n">Eb</span> <span class="n">G</span><span class="p">;</span><span class="n">Cm</span>
+ <span class="n">C</span><span class="c1"># E G#;C#m</span>
+ <span class="n">Db</span> <span class="n">E</span> <span class="n">Ab</span><span class="p">;</span><span class="n">Dbm</span>
+ <span class="n">D</span> <span class="n">F</span> <span class="n">A</span><span class="p">;</span><span class="n">Dm</span>
+ <span class="n">D</span><span class="c1"># F# A#;D#m</span>
+ <span class="n">Eb</span> <span class="n">Gb</span> <span class="n">Bb</span><span class="p">;</span><span class="n">Ebm</span>
+ <span class="n">E</span> <span class="n">G</span> <span class="n">B</span><span class="p">;</span><span class="n">Em</span>
+ <span class="n">F</span> <span class="n">Ab</span> <span class="n">C</span><span class="p">;</span><span class="n">Fm</span>
+ <span class="n">F</span><span class="c1"># A C#;F#m</span>
+ <span class="n">Gb</span> <span class="n">A</span> <span class="n">Db</span><span class="p">;</span><span class="n">Gbm</span>
+ <span class="n">G</span> <span class="n">Bb</span> <span class="n">D</span><span class="p">;</span><span class="n">Gm</span>
+ <span class="n">G</span><span class="c1"># B D#;G#m</span>
+ <span class="n">Ab</span> <span class="n">B</span> <span class="n">Eb</span><span class="p">;</span><span class="n">Abm</span>
+ <span class="n">A</span> <span class="n">C</span> <span class="n">E</span><span class="p">;</span><span class="n">Am</span>
+ <span class="n">A</span><span class="c1"># C# F;A#m</span>
+ <span class="n">Bb</span> <span class="n">Db</span> <span class="n">F</span><span class="p">;</span><span class="n">Bbm</span>
+ <span class="n">B</span> <span class="n">D</span> <span class="n">F</span><span class="c1">#;Bm</span>
+</pre></div>
+</div>
+<p>To generate the drawings of each chords with <code class="docutils literal"><span class="pre">--keyprint</span></code> and <code class="docutils literal"><span class="pre">--zoom</span> <span class="pre">1.5</span></code> options, we use the following shell command:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">showchord</span> <span class="o">-</span><span class="n">f</span> <span class="n">min_</span> <span class="o">-</span><span class="n">k</span> <span class="o">-</span><span class="n">z</span> <span class="mf">1.5</span> <span class="o">&lt;</span> <span class="n">minor</span><span class="o">-</span><span class="n">chords</span><span class="o">-</span><span class="n">root</span><span class="o">.</span><span class="n">txt</span>
+</pre></div>
+</div>
+<p>This provides one SVG file per line:</p>
+<p><a class="reference external" href="_static/examples/stream/minor/min_Cm_0.svg"><img alt="min_Cm_0.svg" src="_images/min_Cm_0.svg" /></a> <a class="reference external" href="_static/examples/stream/minor/min_Csm_1.svg"><img alt="min_Csm_1.svg" src="_images/min_Csm_1.svg" /></a> <a class="reference external" href="_static/examples/stream/minor/min_Dbm_2.svg"><img alt="min_Dbm_2.svg" src="_images/min_Dbm_2.svg" /></a> <a class="reference external" href="_static/examples/stream/minor/min_Dm_3.svg"><img alt="min_Dm_3.svg" src="_images/min_Dm_3.svg" /></a> <a class="reference external" href="_static/examples/stream/minor/min_Dsm_4.svg"><img alt="min_Dsm_4.svg" src="_images/min_Dsm_4.svg" /></a> <a class="reference external" href="_static/examples/stream/minor/min_Ebm_5.svg"><img alt="min_Ebm_5.svg" src="_images/min_Ebm_5.svg" /></a> <a class="reference external" href="_static/examples/stream/minor/min_Em_6.svg"><img alt="min_Em_6.svg" src="_images/min_Em_6.svg" /></a> <a class="reference external" href="_static/examples/stream/minor/min_Fm_7.svg"><img alt="min_Fm_7.svg" src="_images/min_Fm_7.svg" /></a> <a class="reference external" href="_static/examples/stream/minor/min_Fsm_8.svg"><img alt="min_Fsm_8.svg" src="_images/min_Fsm_8.svg" /></a> <a class="reference external" href="_static/examples/stream/minor/min_Gbm_9.svg"><img alt="min_Gbm_9.svg" src="_images/min_Gbm_9.svg" /></a> <a class="reference external" href="_static/examples/stream/minor/min_Gm_10.svg"><img alt="min_Gm_10.svg" src="_images/min_Gm_10.svg" /></a> <a class="reference external" href="_static/examples/stream/minor/min_Gsm_11.svg"><img alt="min_Gsm_11.svg" src="_images/min_Gsm_11.svg" /></a> <a class="reference external" href="_static/examples/stream/minor/min_Abm_12.svg"><img alt="min_Abm_12.svg" src="_images/min_Abm_12.svg" /></a> <a class="reference external" href="_static/examples/stream/minor/min_Am_13.svg"><img alt="min_Am_13.svg" src="_images/min_Am_13.svg" /></a> <a class="reference external" href="_static/examples/stream/minor/min_Asm_14.svg"><img alt="min_Asm_14.svg" src="_images/min_Asm_14.svg" /></a> <a class="reference external" href="_static/examples/stream/minor/min_Bbm_15.svg"><img alt="min_Bbm_15.svg" src="_images/min_Bbm_15.svg" /></a> <a class="reference external" href="_static/examples/stream/minor/min_Bm_16.svg"><img alt="min_Bm_16.svg" src="_images/min_Bm_16.svg" /></a></p>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="documentation.html" class="btn btn-neutral float-right" title="Documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="features.html" class="btn btn-neutral" title="Features" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Alain Cherpin.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.6.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

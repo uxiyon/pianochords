@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   id="chords"
+   version="1.1"
+   preserveAspectRatio="xMinYMin meet"
+   viewBox="0 0 420.32 148.0"
+   width="420.32"
+   height="227.92">
+  <defs
+     id="defs4516" />
+  <metadata
+     id="metadata4519">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>  <text
+     id="title_Ab 7"
+     y="41.44"
+     x="159.84"
+     style="font-style:normal;font-weight:bold;font-size:2.96em;line-height:3.7;font-family:monospace;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+     xml:space="preserve"><tspan
+       id="tspanTITLE">Ab 7</tspan>
+  </text>  <g
+    transform="translate(1,59.2)"
+    id="chordAb 7">    <rect
+    id="C"
+    width="29.6"
+    height="118.4"
+    x="0.0"
+    y="0"
+    style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-opacity:1"
+    />    <rect
+    id="D"
+    width="29.6"
+    height="118.4"
+    x="29.6"
+    y="0"
+    style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-opacity:1"
+    />    <rect
+    id="E"
+    width="29.6"
+    height="118.4"
+    x="59.2"
+    y="0"
+    style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-opacity:1"
+    />    <rect
+    id="F"
+    width="29.6"
+    height="118.4"
+    x="88.8"
+    y="0"
+    style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-opacity:1"
+    />    <rect
+    id="G"
+    width="29.6"
+    height="118.4"
+    x="118.4"
+    y="0"
+    style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-opacity:1"
+    />    <rect
+    id="A"
+    width="29.6"
+    height="118.4"
+    x="148.0"
+    y="0"
+    style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-opacity:1"
+    />    <rect
+    id="B"
+    width="29.6"
+    height="118.4"
+    x="177.6"
+    y="0"
+    style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-opacity:1"
+    />    <rect
+    id="C#"
+    width="17.76"
+    height="71.04"
+    x="20.72"
+    y="0"
+    style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-opacity:1"
+    />    <rect
+    id="D#"
+    width="17.76"
+    height="71.04"
+    x="50.32"
+    y="0"
+    style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-opacity:1"
+    />    <rect
+    id="F#"
+    width="17.76"
+    height="71.04"
+    x="109.52"
+    y="0"
+    style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-opacity:1"
+    />    <rect
+    id="G#"
+    width="17.76"
+    height="71.04"
+    x="139.12"
+    y="0"
+    style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-opacity:1"
+    />    <rect
+    id="A#"
+    width="17.76"
+    height="71.04"
+    x="168.72"
+    y="0"
+    style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-opacity:1"
+    />    <rect
+    id="C"
+    width="29.6"
+    height="118.4"
+    x="207.2"
+    y="0"
+    style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-opacity:1"
+    />    <rect
+    id="D"
+    width="29.6"
+    height="118.4"
+    x="236.8"
+    y="0"
+    style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-opacity:1"
+    />    <rect
+    id="E"
+    width="29.6"
+    height="118.4"
+    x="266.4"
+    y="0"
+    style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-opacity:1"
+    />    <rect
+    id="F"
+    width="29.6"
+    height="118.4"
+    x="296.0"
+    y="0"
+    style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-opacity:1"
+    />    <rect
+    id="G"
+    width="29.6"
+    height="118.4"
+    x="325.6"
+    y="0"
+    style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-opacity:1"
+    />    <rect
+    id="A"
+    width="29.6"
+    height="118.4"
+    x="355.2"
+    y="0"
+    style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-opacity:1"
+    />    <rect
+    id="B"
+    width="29.6"
+    height="118.4"
+    x="384.8"
+    y="0"
+    style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-opacity:1"
+    />    <rect
+    id="C#"
+    width="17.76"
+    height="71.04"
+    x="227.92"
+    y="0"
+    style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-opacity:1"
+    />    <rect
+    id="D#"
+    width="17.76"
+    height="71.04"
+    x="257.52"
+    y="0"
+    style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-opacity:1"
+    />    <rect
+    id="F#"
+    width="17.76"
+    height="71.04"
+    x="316.72"
+    y="0"
+    style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-opacity:1"
+    />    <rect
+    id="G#"
+    width="17.76"
+    height="71.04"
+    x="346.32"
+    y="0"
+    style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-opacity:1"
+    />    <rect
+    id="A#"
+    width="17.76"
+    height="71.04"
+    x="375.92"
+    y="0"
+    style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-opacity:1"
+    />  <circle
+  id="path[4, 0, NteType(h_init_offset=7, dim=KeyDim(width=6, height=24), app=KeyApp(color='#000000'), mark=KeyMark(color='#ffffff', v_offset=16.200000000000003))]"
+  r="8.88"
+  cx="147.704"
+  cy="47.952"
+  style="fill:#ffffff;fill-opacity:1;stroke-width:0.38909313"
+  />  <text
+     id="key_Ab"
+     y="134.7392"
+     x="136.2192"
+     style="font-style:normal;font-weight:bold;font-size:1.48em;line-height:4.3808;font-family:monospace;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+     xml:space="preserve"><tspan
+       id="tspan_Ab">Ab</tspan>
+  </text>  <circle
+  id="path[0, 0, NteType(h_init_offset=0, dim=KeyDim(width=10, height=40), app=KeyApp(color='#ffffff'), mark=KeyMark(color='#000000', v_offset=32.0))]"
+  r="8.88"
+  cx="222.0"
+  cy="94.72"
+  style="fill:#000000;fill-opacity:1;stroke-width:0.38909313"
+  />  <text
+     id="key_C"
+     y="151.552"
+     x="218.3296"
+     style="font-style:normal;font-weight:bold;font-size:1.48em;line-height:4.3808;font-family:monospace;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+     xml:space="preserve"><tspan
+       id="tspan_C">C</tspan>
+  </text>  <circle
+  id="path[1, 1, NteType(h_init_offset=7, dim=KeyDim(width=6, height=24), app=KeyApp(color='#000000'), mark=KeyMark(color='#ffffff', v_offset=16.200000000000003))]"
+  r="8.88"
+  cx="266.104"
+  cy="47.952"
+  style="fill:#ffffff;fill-opacity:1;stroke-width:0.38909313"
+  />  <text
+     id="key_Eb"
+     y="134.7392"
+     x="254.6192"
+     style="font-style:normal;font-weight:bold;font-size:1.48em;line-height:4.3808;font-family:monospace;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+     xml:space="preserve"><tspan
+       id="tspan_Eb">Eb</tspan>
+  </text>  <circle
+  id="path[3, -1, NteType(h_init_offset=7, dim=KeyDim(width=6, height=24), app=KeyApp(color='#000000'), mark=KeyMark(color='#ffffff', v_offset=16.200000000000003))]"
+  r="8.88"
+  cx="325.304"
+  cy="47.952"
+  style="fill:#ffffff;fill-opacity:1;stroke-width:0.38909313"
+  />  <text
+     id="key_Gb"
+     y="134.7392"
+     x="313.8192"
+     style="font-style:normal;font-weight:bold;font-size:1.48em;line-height:4.3808;font-family:monospace;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+     xml:space="preserve"><tspan
+       id="tspan_Gb">Gb</tspan>
+  </text></g></svg>
