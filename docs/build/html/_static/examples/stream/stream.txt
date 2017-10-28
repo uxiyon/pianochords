@@ -1,0 +1,9 @@
+c e   g;C
+
+;Fill the chord
+;
+e t b;Em
+g b d;G
+D F# R;D
+C Eb Gb Bbb;Cdim7
+C E G;C major
