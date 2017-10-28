@@ -3,7 +3,7 @@ Show chords on a piano keyboard to see how to play it.
 
 From notes, showchord produces SVG image files representing a two-scaled keyboard with marks on it.
 
-![zoom_3_Cdim7_0.png](examples/zoom_3_Cdim7_0.png)
+![zm_2_5_Cdim7_0.svg](docs/source/_static/examples/zm_2_5_Cdim7_0.svg)
 
 ## Features
 
