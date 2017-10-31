@@ -18,5 +18,5 @@ From notes, showchord produces SVG image files representing a two-scaled keyboar
 
 ## Examples, documentation and more
 
-http://kkwoin.hd.free.fr/showchord
+http://showchord.duckdns.org/
 
