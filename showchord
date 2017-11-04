@@ -535,6 +535,9 @@ def sanitize(name):
     tmp = name.replace("_ ", "_")
     tmp = tmp.replace(" ", "_")
     tmp = tmp.replace("#","s")
+    tmp = tmp.replace("/","")
+    tmp = tmp.replace("__","_")
+    tmp = tmp.replace("--","-")
     return tmp
 
 ###############################################
@@ -603,6 +606,12 @@ def png_export(export, files):
         # TODO: raise an exception instead of printing error message
         print("No export command found in " + str(EXPORT_CMD.keys()),
               file=sys.stderr)
+
+###############################################
+# read chords from a musicxml stream
+def musicxml_stream():
+    print('musicxml_stream')
+
 
 
 ###############################################
