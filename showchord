@@ -700,7 +700,6 @@ def in_stream():
     root = None
     try:
         root = ET.fromstring(file_data)
-        print(str(root))
     except KeyboardInterrupt:
         print('\ntry: ' + sys.argv[0] + ' < file', file=sys.stderr)
         sys.exit(0)
@@ -804,14 +803,13 @@ if __name__ == '__main__':
     ## TODO: FIX IT: DOES NOT WORK !!
     if not chords:
         chords = in_stream()
-        print(str(chords))
 
     all_chords = build_chords()
 
-    svg_file([entry[:2] for entry in all_chords if entry[0] != ''])
-#    print(str([entry[:2] for entry in all_chords if entry[0] != '']))
+    svg_list = [entry[:2] for entry in all_chords if entry[0] != '']
+    svg_file(svg_list)
 
     png_export(export, [entry[1] for entry in all_chords if entry[1] != ''])
     report_error([entry[2] for entry in all_chords if entry[2] != ''])
 
-#    print(str([entry[2] for entry in all_chords if entry[2] != '']))
+    print('Done !\n' + str(len(svg_list)) + ' files created', file=sys.stdout)
