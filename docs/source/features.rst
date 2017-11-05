@@ -11,8 +11,8 @@ List
 * Export to bitmap (PNG) file (by default, resulting is stored in SVG files)
 * Force output filename prefix
 * Provide zoom value to change the drawing size
-* Generate many chords at once from informations taken from a stream
-  * stream from musicxml file or simple specific csv-like file
+* Generate many chords at once from informations taken from a stream. 
+  Stream from musicxml file or simple specific csv-like file.
 
 Motivation
 ----------
