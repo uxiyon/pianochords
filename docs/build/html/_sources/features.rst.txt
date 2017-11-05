@@ -12,6 +12,7 @@ List
 * Force output filename prefix
 * Provide zoom value to change the drawing size
 * Generate many chords at once from informations taken from a stream
+*   stream from musicxml file or simple specific csv-like file
 
 Motivation
 ----------
@@ -40,6 +41,7 @@ Dependencies
    - sys
    - subprocess
    - argparse
+   - xml.etree.ElementTree
    - collections (namedtuple)
 
 #. External programs (optional, only required for bitmap export)
