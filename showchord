@@ -61,6 +61,9 @@ import os, sys, subprocess
 import argparse
 from collections import namedtuple
 
+# for input from musicxml files
+import xml.etree.ElementTree as ET
+
 ## constants
 WTE_WIDTH = 10
 WTE_HEIGHT = (4 * WTE_WIDTH)
@@ -609,25 +612,66 @@ def png_export(export, files):
 
 ###############################################
 # read chords from a musicxml stream
-def musicxml_stream():
-    print('musicxml_stream')
+def musicxml_stream(root):
+    chord = []
+    lines = []
 
+    def alter_text(alter):
+        if alter is None: return ''
+        if alter.text == '-1': return 'b'
+        if alter.text == '-2': return 'bb'
+        if alter.text == '1': return '#'
+        if alter.text == '2': return 'x'
+
+    # search for chords in each measures
+    for m in root.iter('measure'):
+        # chord index in the measure
+        chord_num = 0
+
+        # find all notes in the measure
+        # ignore if no notes found
+        notes = m.iter('note')
+        nb_notes = len(list(notes)) - 1
+        if nb_notes == 0: continue
+
+        title = 'm ' + m.get('number')
+        for n in m.iter('note'):
+            # if a note is not marked as chord:
+            #  increment chord_num
+            #  store the current chord and its name
+            #  as a new list entry
+            #  define a new chord (reset chord)
+            if n.find('chord') is None:
+                if len(chord) > 1:
+                    # we are right after the end of a previous chord
+                    chord_num += 1
+                    # transform the notes list in a string and add the title
+                    # TODO: enhance this useless behaviour
+                    lines.append(' '.join(chord) + ';' + title + ' / chord ' + str(chord_num))
+                chord = []
+
+            p = n.find('pitch')
+            if p is not None:
+                step = p.find('step')
+                alter = alter_text(p.find('alter'))
+                octave = p.find('octave')
+                # store note in a list for simplicity
+                chord.append(step.text  + alter)
+
+    return lines
 
 
 ###############################################
-# TODO: fix it ! Does not work with interactive input
-# read stream from standard input
-def in_stream():
-    # read standard input (stream mode) only if no chord
-    # are present in chords list
-    # stream mode means read input stream until EOF is reached and
+# read chords from csv-like format
+def simple_stream(file_data):
     # draw one chord for each line.
     # line should be of the following form:
     # C E G;C major
-    # i.e: 2 parts: chord;chordname
+    # i.e: 2 parts: chord;title
     lines = []
+    data = file_data.split('\n')
     try:
-        for line in sys.stdin:
+        for line in data:
             # remove trailing '\n'
             line = line.replace('\n', '')
 
@@ -640,6 +684,35 @@ def in_stream():
     except KeyboardInterrupt:
         return lines
     return lines
+
+###############################################
+# TODO: fix it ! Does not work with interactive input
+# read stream from standard input
+def in_stream():
+    # read standard input and store all data in a string
+    # first try to transform the stream as an xml tree
+    # if it fails with another exception than KeyboardInterrupt
+    # then try to load basic specific showchord format
+
+    file_data = sys.stdin.read()
+    simple = False
+
+    root = None
+    try:
+        root = ET.fromstring(file_data)
+        print(str(root))
+    except KeyboardInterrupt:
+        print('\ntry: ' + sys.argv[0] + ' < file', file=sys.stderr)
+        sys.exit(0)
+    except:
+        # the stream is not valid xml, try simple format
+        simple = True
+	lines = simple_stream(file_data)
+
+    if simple == True:
+        return lines
+
+    return musicxml_stream(root)
 
 ###############################################
 # running actions when used interactively
