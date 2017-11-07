@@ -99,9 +99,6 @@ export_cmd = ''
 
 ## variables fed from arguments
 
-# list of chords of the forme 'N N N N;Chord Name'
-chords = []
-
 # print note name under marked key
 keyprint = False
 
@@ -158,6 +155,22 @@ NOTES = {'Cbb' : 10,
          'B#': 0,
          'Bx': 1}
 
+'''Note in an octave
+   a note is a couple of the form ['note_name', octave]
+   note_name is used to name the note and to 
+   place it in a single scale via the index found in NOTES
+   octave is used to tell witch scale to address,
+   from 0 (lowest A) to 8 (highest C) on an 88 piano keyboard'''
+note = []
+
+'''list of chords of the forme 'N N N N;Title'
+   where N is a note ['note_name', octave]
+   and title is a string
+   chords data are provided via command line arguments or
+   via input stream'''
+chords = []
+
+
 ###########################
 # define a note representation
 
@@ -211,6 +224,9 @@ NOTES_REPR.append([5, 0, white])	# 9  : A
 NOTES_REPR.append([5, 1, black])	# 10 : A#
 NOTES_REPR.append([6, 0, white])	# 11 : B
 
+# 88 keyboard - octaves : 0 to 8
+
+
 ###############################################
 # functions
 ###############################################
@@ -236,8 +252,9 @@ Show chord notes on a piano keyboard, output each chord on a SVG image
   b (flat/bemol)
   x (## double sharp / double dieze)
   bb (double flat / double bemol)
+- Octave value is optional after note name
 
-  e.g: "C Eb Gb Bbb;Cdim7" "C E G;C major"
+  e.g: "C Eb Gb Bbb;Cdim7" "C E G;C major" "C4 Eb4 Gb Bbb;Cdim4 - oct. 4"
 
 - Stream input from CSV file with the same format (without quotes):
   C Eb Gb Bbb;Cdim7
@@ -507,30 +524,16 @@ def svg_draw_chord(ch, ch_name):
     key_idx = 0
 
     for note in ch:
-        k_idx = NOTES[note]
+        k_idx = NOTES[note[0]]
         if k_idx < key_idx:
             octv_shift = (7 * WTE_WIDTH * zoom)
-        svg_chord += svg_draw_mark(octv_shift, note)
+        svg_chord += svg_draw_mark(octv_shift, note[0])
         if keyprint:
-            svg_chord += svg_draw_keyname(octv_shift, note)
+            svg_chord += svg_draw_keyname(octv_shift, note[0])
         key_idx = k_idx
 
     svg_chord += svg_g_close()
     return svg_chord
-
-###############################################
-# check if all note names in given chord are correct
-# else raise a NameError exception that returns the bad note name
-def check_chord(ch):
-    cleaned_chord = []
-    for note in ch:
-        if note.capitalize() in NOTES:
-            cleaned_chord.append(note.capitalize())
-        else:
-            # note not found
-            raise NameError(note)
-
-    return cleaned_chord
 
 ###############################################
 # cleanup name to be OS compatible
@@ -656,7 +659,7 @@ def musicxml_stream(root):
                 alter = alter_text(p.find('alter'))
                 octave = p.find('octave')
                 # store note in a list for simplicity
-                chord.append(step.text  + alter)
+                chord.append(step.text  + alter + octave.text)
 
     return lines
 
@@ -714,6 +717,58 @@ def in_stream():
     return musicxml_stream(root)
 
 ###############################################
+# divide a given NoteOctave string into
+# ['note', octave] list
+# octave is optional
+# return None if note_string is None or not valid
+def split_note(note_string):
+    note_name = ''
+    octave = ''
+
+    # ignore empty notes
+    if note_string is None: return None
+
+    # separate note name and octave value
+    # octave is optional
+    if note_string[-1:] in '012345678':
+        # octave value found
+
+        # extract all but the last char
+        note_name = note_string[:-1].capitalize()
+        # extract the last char
+        octave = note_string[-1:]
+
+    else:
+        # no octave value found
+        note_name = note_string.capitalize()
+
+    # ignore unknown note
+    if note_name not in NOTES: raise NameError(note_name)
+
+    # return a couple of 2 elements
+    return note_name,octave
+
+###############################################
+# extract notes from an string representing
+# a chord
+# 'A#4 Bbb4 C5' -> [('A#',4),('Bbb',4),('C',5)]
+# 'T C A'       -> None
+def str_to_chord(chord_str):
+    if chord_str == '': return None
+
+    note = []
+    chord = []
+    for n in chord_str.split():
+        try:
+            note = split_note(n)
+        except NameError:
+            raise NameError(n)
+
+        chord.append(note)
+
+    return chord
+
+###############################################
 # running actions when used interactively
 def build_chords():
     # all_chords stores a list of list of chords
@@ -723,15 +778,22 @@ def build_chords():
     # chords is not empty if we reach this point
     index = 0
     for line in chords:
+        chord = []
 
         # extract chord and title
         parts = line.split(';')
 
-        # store chord in a list of notes
-        chord = parts[0]
-
         # note names in a list, first letter uppercase
-        chord = [note.capitalize() for note in chord.split()]
+        #chord = [note.capitalize() for note in chord.split()]
+        try:
+            chord = str_to_chord(parts[0])
+        except NameError as e:
+            all_chords.append(['', '', 
+                '"{}": bad input in "{}" (line ignored)'.format(str(e), str(chord))
+                ])
+            index += 1
+            continue
+
 
         # if chord empty then reset key print space below keyboard
         # else set user defined choice from --keyprint
@@ -745,16 +807,6 @@ def build_chords():
             title = parts[1]
             if title == r'\\':
                 title = ' '
-
-        # exit if at least one bad note name is given
-        try:
-            chord = check_chord(chord)
-        except NameError as e:
-            all_chords.append(['', '', 
-                '"{}": bad input in "{}" (line ignored)'.format(str(e), str(chord))
-                ])
-            index += 1
-            continue
 
         # make output file name
         if title and title != ' ':
@@ -796,11 +848,12 @@ def report_error(errors):
 
 # only run on interactive use, not when imported
 if __name__ == '__main__':
+
     # get script options and arguments
     # this may provide chords in chords list
     args()
 
-    ## TODO: FIX IT: DOES NOT WORK !!
+    ## TODO: FIX IT: DOES NOT PROPERLY WORK !!
     if not chords:
         chords = in_stream()
 

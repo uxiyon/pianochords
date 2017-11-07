@@ -10,7 +10,7 @@
   - [ ] rename showchord to showchord.py
   - [ ] create a simple script (sc) to run showchord.py
 - [x] read chords from a musicxml partition
-  - [ ] take octave in consideration
+  - [x] accept octave information in a note name (ex. A#7 for A# on octave 7)
     - [ ] write chords on a piano keyboard (88 keys)
   - [ ] distinguish octave notes to write notes on the right keys
 - [ ] add version information
