@@ -187,15 +187,33 @@
 </div>
 <p>Refere to <a class="reference internal" href="examples.html#examples-basic"><span class="std std-ref">Basic</span></a> for basic examples.</p>
 <p>There are typically two ways to input chords.</p>
+<ul class="simple">
+<li>Directly as arguments, you can provide as many chords as you like</li>
+</ul>
+<p>The format is <code class="docutils literal"><span class="pre">N</span> <span class="pre">..</span> <span class="pre">N;Chord</span> <span class="pre">title</span></code> where <code class="docutils literal"><span class="pre">N</span></code> is a note, and <code class="docutils literal"><span class="pre">Chord</span> <span class="pre">title</span></code> is a string.</p>
+<p>A note is:</p>
+<ul class="simple">
+<li>a pitch step noted in german style, so it must be one of {A, B, C, D, E, F G}</li>
+<li>followed by an optional <em>accidental</em>, one of {<code class="docutils literal"><span class="pre">#</span></code>, <code class="docutils literal"><span class="pre">b</span></code>, <code class="docutils literal"><span class="pre">x</span></code>, <code class="docutils literal"><span class="pre">bb</span></code>}</li>
+<li>followed by an optional <em>octave</em> value, one of {0 .. 8}</li>
+</ul>
+<div class="topic">
+<p class="topic-title first">Accidentals</p>
+<p><code class="docutils literal"><span class="pre">#</span></code>: sharp (dièze)</p>
+<p><code class="docutils literal"><span class="pre">b</span></code>: flat (bémol)</p>
+<p><code class="docutils literal"><span class="pre">x</span></code>: double # (x &lt;=&gt; ##)</p>
+<p><code class="docutils literal"><span class="pre">bb</span></code>: double flat</p>
+</div>
 <ul>
-<li><p class="first">Directly as arguments, you can provide as many chords as you like</p>
-</li>
 <li><p class="first">From an input stream</p>
 <blockquote>
 <div><ul class="simple">
 <li>from a file using system redirection</li>
 </ul>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">showchord</span> <span class="o">&lt;</span> <span class="n">chordlist</span><span class="o">.</span><span class="n">csv</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">showchord</span> <span class="o">&lt;</span> <span class="n">musicxml_partition</span><span class="o">.</span><span class="n">xml</span>
 </pre></div>
 </div>
 <ul class="simple">
@@ -207,7 +225,10 @@
 </div></blockquote>
 </li>
 </ul>
-<p>Note that it is possible to produce the picture of an empty 2 scales keyboard by providing an empty string as chord input (see the first basic example in <a class="reference internal" href="examples.html#examples-basic"><span class="std std-ref">Basic</span></a>).</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">It is possible to produce the picture of an empty 2 scales keyboard by providing an empty string as chord input (see the first basic example in <a class="reference internal" href="examples.html#examples-basic"><span class="std std-ref">Basic</span></a>).</p>
+</div>
 </div>
 <div class="section" id="options">
 <h2>Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h2>
@@ -217,12 +238,19 @@
 </div>
 <div class="section" id="fileprefix">
 <h3>fileprefix<a class="headerlink" href="#fileprefix" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal"><span class="pre">--fileprefix</span></code> (short: <code class="docutils literal"><span class="pre">-f</span></code>) option is used to set the begining of generated SVG file names. The default prefix is <code class="docutils literal"><span class="pre">chord_</span></code>, thus without <code class="docutils literal"><span class="pre">-f</span></code> option, all output files are named <code class="docutils literal"><span class="pre">chord_&lt;somename&gt;_N.svg</span></code> where <code class="docutils literal"><span class="pre">&lt;somename&gt;</span></code> depends on the chord title and where <code class="docutils literal"><span class="pre">N</span></code> is an integer to disinguish two similar named files.</p>
 </div>
 <div class="section" id="zoom">
 <h3>zoom<a class="headerlink" href="#zoom" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal"><span class="pre">--zoom</span></code> (short: <code class="docutils literal"><span class="pre">-z</span></code>) option set the zoom factor of the output image. The value is a float number (e.g 2.45), but an integer is allowed (e.g 5)</p>
 </div>
 <div class="section" id="export">
 <h3>export<a class="headerlink" href="#export" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal"><span class="pre">--export</span></code> (short: <code class="docutils literal"><span class="pre">-e</span></code>) switches the generation of bitmap PNG images. This option requires that either <code class="docutils literal"><span class="pre">inkscape</span></code> or <code class="docutils literal"><span class="pre">rsvg-convert</span></code> is installed the system that runs showchord.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This option may overload your system if many chords are provided (ex. from a large musicxlm partition)</p>
+</div>
 </div>
 </div>
 </div>
