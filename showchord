@@ -65,32 +65,37 @@ from collections import namedtuple
 import xml.etree.ElementTree as ET
 
 ## constants
+VERSION = '0.7.2'
+
 WTE_WIDTH = 10
 WTE_HEIGHT = (4 * WTE_WIDTH)
 WTE_INIT_OFFSET = 0
-WTE_COLOR = "#ffffff"
+WTE_COLOR = '#ffffff'
 WTE_OPACITY = 1
 WTE_TYPE = 0
 WTE_MARK_V_OFFSET = (3.2 * WTE_WIDTH)
-WTE_MARK_COLOR = "#000000"
+WTE_MARK_COLOR = '#000000'
 
 BLK_SHIFT = 1     # specific black key shift value
 BLK_WIDTH = 6
 BLK_HEIGHT = (4 * BLK_WIDTH)
 BLK_INIT_OFFSET = (WTE_WIDTH - (BLK_WIDTH / 2) )
-BLK_COLOR = "#000000"
+BLK_COLOR = '#000000'
 BLK_OPACITY = 1
 BLK_TYPE = 1
 BLK_MARK_V_OFFSET = (2.7 * BLK_WIDTH)
-BLK_MARK_COLOR = "#ffffff"
+BLK_MARK_COLOR = '#ffffff'
 
 
 OUTPUT = sys.stdout
-SVG_ID = "chords"
+SVG_ID = 'chords'
 HEIGHT_TITLE = 20
 HEIGHT_PRINTKEY = 15
 CHORD_Y_SHIFT = 20
 MARK_RADIUS = 3
+
+# first octave if notes do not contain oct. info
+DEFAULT_OCTAVE = 4
 
 EXPORT_CMD = {'inkscape': ' -D -f {} -e {} >/dev/null',
               'rsvg-convert': ' {} -o {} -a >/dev/null'}
@@ -116,6 +121,10 @@ height_keyprint = 0
 
 # zoom value
 zoom = 1
+
+# full 88 piano keyboard switch
+# autosized when false
+kbd88 = False
 
 # 35 representable notes on a single scale with
 # their index on the scale
@@ -199,33 +208,28 @@ blk_app = KeyApp(BLK_COLOR)
 blk_mark = KeyMark(BLK_MARK_COLOR, BLK_MARK_V_OFFSET)
 black = KeyType(BLK_INIT_OFFSET, blk_dim, blk_app, blk_mark)
 
-# note lists for drawing keyboard as in SVG black keys
-# must be after to override white keys
-WHITES = ['C', 'D', 'E', 'F', 'G', 'A', 'B']
-BLACKS = ['C#', 'D#', 'F#', 'G#', 'A#']
+# note lists for drawing keyboard
+KEYS = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 
-# 12 notes representation by id, ordered from their 
+# 12 notes representation by id, ordered from their
 # position on the piano keyboard
-# the implicite id is the link between NOTES and NOTES_REPR
-# First value is white note index
-# Second value is shift direction -1:left, 0:center, 1:right
+# the id (4th element) is the link between NOTES and NOTES_REPR
+# First value is the white note index
+# Second value is the shift direction -1:left, 0:center, 1:right
 # white or black are structure containing drawing information
 NOTES_REPR = []
-NOTES_REPR.append([0, 0, white])	# 0  : C
-NOTES_REPR.append([0, -1, black])       # 1  : C#
-NOTES_REPR.append([1, 0, white]) 	# 2  : D
-NOTES_REPR.append([1, 1, black])	# 3  : D#
-NOTES_REPR.append([2, 0, white])	# 4  : E
-NOTES_REPR.append([3, 0, white])	# 5  : F
-NOTES_REPR.append([3, -1, black])	# 6  : F#
-NOTES_REPR.append([4, 0, white])	# 7  : G
-NOTES_REPR.append([4, 0, black])	# 8  : G#
-NOTES_REPR.append([5, 0, white])	# 9  : A
-NOTES_REPR.append([5, 1, black])	# 10 : A#
-NOTES_REPR.append([6, 0, white])	# 11 : B
-
-# 88 keyboard - octaves : 0 to 8
-
+NOTES_REPR.append([0, 0, white,  0])	# 0  : C
+NOTES_REPR.append([0, -1, black, 1])    # 1  : C#
+NOTES_REPR.append([1, 0, white,  2]) 	# 2  : D
+NOTES_REPR.append([1, 1, black,  3])	# 3  : D#
+NOTES_REPR.append([2, 0, white,  4])	# 4  : E
+NOTES_REPR.append([3, 0, white,  5])	# 5  : F
+NOTES_REPR.append([3, -1, black, 6])	# 6  : F#
+NOTES_REPR.append([4, 0, white,  7])	# 7  : G
+NOTES_REPR.append([4, 0, black,  8])	# 8  : G#
+NOTES_REPR.append([5, 0, white,  9])	# 9  : A
+NOTES_REPR.append([5, 1, black, 10])	# 10 : A#
+NOTES_REPR.append([6, 0, white, 11])	# 11 : B
 
 ###############################################
 # functions
@@ -240,6 +244,7 @@ def args():
     global export
     global fileprefix
     global zoom
+    global kbd88
 
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -254,7 +259,7 @@ Show chord notes on a piano keyboard, output each chord on a SVG image
   bb (double flat / double bemol)
 - Octave value is optional after note name
 
-  e.g: "C Eb Gb Bbb;Cdim7" "C E G;C major" "C4 Eb4 Gb Bbb;Cdim4 - oct. 4"
+  e.g: "C Eb Gb Bbb;Cdim7" "C E G;C major" "C5 Eb5 Gb5 Bbb5;Cdim7 - 5th octv"
 
 - Stream input from CSV file with the same format (without quotes):
   C Eb Gb Bbb;Cdim7
@@ -263,7 +268,9 @@ Show chord notes on a piano keyboard, output each chord on a SVG image
 
   showchord [OPTIONS] < chord_list.csv
     OR
-  cat chord_list.csv | showchord [OPTIONS]''')
+  cat chord_list.csv | showchord [OPTIONS]
+
+- Stream input from MusicXML format''')
 
     # optional list of chords
     # if no chord provided then enter in stream mode
@@ -271,7 +278,7 @@ Show chord notes on a piano keyboard, output each chord on a SVG image
     # ex: 'D F# A;D major' 'e g# B;E' 'E A b c'
     parser.add_argument('chords',
 	nargs='*',
-	help='Notes of the chord, followed or not by chord name. Ex. "C Eb Gb Bbb;Cdim7" "C E G"')
+	help='Notes of the chord, followed or not by chord name. Ex. "C Eb Gb Bbb;Cdim7" "C3 E4 G5"')
 
     # print note name below each marked key
     parser.add_argument('--keyprint', '-k',
@@ -293,6 +300,11 @@ Show chord notes on a piano keyboard, output each chord on a SVG image
 	type=float,
 	action='store',
 	help='Zoom value (float), e.g: 2.0 to double output SVG drawing size')
+
+    # full 88 notes common piano keyboard
+    parser.add_argument('--piano', '-p',
+	action='store_true',
+	help='Piano keyboard mode - full 88 keyboard from A0 to C8')
 
     # parse command line and set args.<option> values
     args = parser.parse_args()
@@ -317,9 +329,12 @@ Show chord notes on a piano keyboard, output each chord on a SVG image
     if args.zoom:
         zoom = args.zoom
 
+    # store full 88 notes keyboard choice
+    kbd88 = args.piano
+
 ###############################################
 # print begining of svg file
-def svg_open(title, height_kprint):
+def svg_open(title, height_kprint, num_white_keys):
     svg_header = '''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
@@ -352,9 +367,9 @@ def svg_open(title, height_kprint):
     if title == '': height = 0
     vbox_x = 0
     vbox_y = 0
-    vbox_width = 142 * zoom
+    vbox_width = (num_white_keys * WTE_WIDTH + 2) * zoom
     vbox_heigth = (30 + height) * zoom
-    width = 142 * zoom
+    width = vbox_width
     height = (42 + height + height_kprint) * zoom
     return svg_header.format(vbox_x,
                              vbox_y,
@@ -365,13 +380,13 @@ def svg_open(title, height_kprint):
 
 ###############################################
 # print svg group open
-def svg_g_open(title):
+def svg_g_open(title, num_white_keys):
     ret = ''
     x_translate = 1
     y_translate = 1
     if title != '':
         y_translate = CHORD_Y_SHIFT * zoom
-        ret += svg_draw_title(title)
+        ret += svg_draw_title(title, num_white_keys)
 
     svg_group = '''  <g
     transform="translate({},{})"
@@ -393,12 +408,16 @@ def svg_close():
 
 ###############################################
 # draw the given key as svg rectangle
-def svg_draw_key(octave_shift, notename):
+def svg_draw_key(octave_shift, notename, color, v_shift):
 
     # retrieve key structure from notename
     key = NOTES_REPR[NOTES[notename]]
 
+    COLOR = key[2].app.color
+    if color != '' and color != COLOR: COLOR=color
+
     x = octave_shift + ((key[0] * WTE_WIDTH) + key[2].h_init_offset) * zoom
+
     y = 0
     svg_key = '''    <rect
     id="{}"
@@ -412,8 +431,8 @@ def svg_draw_key(octave_shift, notename):
                           key[2].dim.width * zoom,
                           key[2].dim.height * zoom,
                           x,
-                          y,
-                          key[2].app.color)
+                          v_shift * zoom,
+                          COLOR)
 
 ##############################################
 # draw a mark on the given note as svg circle
@@ -447,7 +466,7 @@ def svg_draw_keyname(octave_shift, notename):
 
     font_size = 0.5 * zoom
     x = octave_shift + ((key[0] * WTE_WIDTH + ((WTE_WIDTH - len(notename) * (font_size + 1)) / 2) + key[2].h_init_offset * 0.5)) * zoom
-    y = (key[2].mark.v_offset * 1.6 + (key[2].h_init_offset * 2.8)) * zoom
+    y = (key[2].mark.v_offset * 1.7 + (key[2].h_init_offset * 2.8)) * zoom
     line_height = 1.25 * zoom
     line_height = font_size * zoom
 
@@ -469,10 +488,10 @@ def svg_draw_keyname(octave_shift, notename):
 
 ###############################################
 # draw chord name as svg text
-def svg_draw_title(title):
+def svg_draw_title(title, num_white_keys):
     y = 14 * zoom
-    x = ((140 - (len(title) * 8)) / 2) * zoom
-    font_size = zoom
+    x = ((num_white_keys * WTE_WIDTH - (len(title) * 8)) / 2) * zoom
+    font_size = 0.8 * zoom
     line_height = 1.25 * zoom
     svg_title = '''  <text
      id="title_{}"
@@ -490,50 +509,199 @@ def svg_draw_title(title):
                             line_height,
                             title)
 
-###############################################
-# draw a 2 octaves keyboard
-def draw_svg_kbd():
-    kbd = ''
-    o_shift = 0
-    # draw notes of 2 octaves
-    for octv in range(0,2):
-        o_shift = (octv * 7 * WTE_WIDTH * zoom)
-        for note in WHITES:
-            kbd += svg_draw_key(o_shift, note)
 
-        for note in BLACKS:
-            kbd += svg_draw_key(o_shift, note)
+###############################################
+# extract key lists from a full scale
+# for drawing purpose
+def whites():
+    '''
+    return white keys list from n_min to n_max
+    keys are white if there name does not contain #
+    '''
+    return [note for note in KEYS if note[-1:] != '#']
+
+def whites_sub(nte_min, nte_max):
+    '''
+    return white keys list from n_min to n_max
+    keys are white if there name does not contain #
+    '''
+    return [note for note in KEYS if note[-1:] != '#'
+        and KEYS.index(note) >= KEYS.index(nte_min)
+        and KEYS.index(note) <= KEYS.index(nte_max)]
+
+def blacks():
+    '''
+    return white keys list from n_min to n_max
+    keys are white if there name does not contain #
+    '''
+    return [note for note in KEYS if note[-1:] == '#']
+
+def blacks_sub(nte_min, nte_max):
+    '''
+    return white keys list from n_min to n_max
+    keys are white if there name does not contain #
+    '''
+    return [note for note in KEYS if note[-1:] == '#'
+        and KEYS.index(note) >= KEYS.index(nte_min)
+        and KEYS.index(note) <= KEYS.index(nte_max)]
+
+###############################################
+# draw a whole set of keys of a certain octave
+# return the corresponding svg code
+def draw_keys(octv_shift, keys, color, v_shift):
+    kbd_part = ''
+    for note in keys:
+        kbd_part += svg_draw_key(octv_shift, note, color, v_shift)
+
+    return kbd_part
+
+###############################################
+# draw a keyboard of arbitrary size
+def draw_svg_kbd(note_min, octave_min, note_max, octave_max):
+    kbd = ''
+
+    OCTV_MIN = octave_min + 1
+    OCTV_MAX = octave_max
+
+    # set first octave scale
+    wht_first = whites_sub(note_min,'B')
+    blk_first = blacks_sub(note_min,'B')
+
+    # set last octave scale
+    wht_last = whites_sub('C', note_max)
+    blk_last = blacks_sub('C', note_max)
+
+    # draw the keyboard in 3 parts
+    base_shift = WTE_WIDTH * zoom
+
+    # lowest octave - may be reduced
+    o_shift = -((7 - len(wht_first)) * base_shift)
+    kbd += draw_keys(o_shift, wht_first, '', 0)
+    kbd += draw_keys(o_shift, blk_first, '', 0)
+
+    # shift of the lowest part
+    shift = len(wht_first) * base_shift
+    o_shift = shift
+
+    # intermediary (full) octaves
+    for octv in range(1, octave_max - octave_min):
+        kbd += draw_keys(o_shift, whites(), '', 0)
+        kbd += draw_keys(o_shift, blacks(), '', 0)
+        o_shift = octv * 7 * base_shift + shift
+
+    # higher octave - may be reduced
+    kbd += draw_keys(o_shift, wht_last, '', 0)
+    kbd += draw_keys(o_shift, blk_last, '', 0)
 
     return kbd
 
 ###############################################
-def svg_draw_chord(ch, ch_name):
+def svg_draw_chord(chord, title, lowest_note, highest_note, num_white_keys):
 
-    svg_chord = svg_g_open(ch_name)
+    svg_chord = svg_g_open(title, num_white_keys)
 
-    # draw keyboard on 2 octaves
-    svg_chord += draw_svg_kbd()
+    # draw a keyboard with as many octaves as given
+    # by the lowest_note and highest_note bounds
+    svg_chord += draw_svg_kbd(lowest_note[0],
+                              int(lowest_note[1]),
+                              highest_note[0],
+                              int(highest_note[1]))
 
-    if not ch:
+    # empty chord: close group tag and return
+    # an empty keyboard (no mark on it)
+    if not chord:
         svg_chord += svg_g_close()
         return svg_chord
 
+    # width of a zoomed white note
+    wht_width = WTE_WIDTH * zoom
+
+    # count white notes in lower octave scale
+    lower_num_wht = len(whites_sub(lowest_note[0], 'B'))
+
+    # left shift value for missing notes of the lower scale
+    shift = -((7 - lower_num_wht) * wht_width)
+
     ## draw a mark on the keys of the given chord
     #  and the note name if keyprint is set
-    octv_shift = 0
+    o_shift = 0
     key_idx = 0
 
-    for note in ch:
-        k_idx = NOTES[note[0]]
-        if k_idx < key_idx:
-            octv_shift = (7 * WTE_WIDTH * zoom)
-        svg_chord += svg_draw_mark(octv_shift, note[0])
+    lowest_octv = int(lowest_note[1])
+    for note in chord:
+        o_shift = (int(note[1]) - lowest_octv) * 7 * wht_width + shift
+        svg_chord += svg_draw_mark(o_shift, note[0])
         if keyprint:
-            svg_chord += svg_draw_keyname(octv_shift, note[0])
-        key_idx = k_idx
+            svg_chord += svg_draw_keyname(o_shift, note[0])
 
     svg_chord += svg_g_close()
     return svg_chord
+
+###############################################
+# draw all chords
+# chords: [chord, title, h_kprint]
+def draw_chords(chords, lowest_note, highest_note):
+
+    if len(lowest_note) == 0: lowest_note = ['C', 4]
+    if len(highest_note) == 0: highest_note = ['B', 5]
+
+    # if bounds are not of an 88 piano keyboard
+    # then draw full scale in octave 0 or 8
+    if lowest_note[1] == 0:
+        if lowest_note[0] != 'A': lowest_note[0] = 'C'
+    else:
+        lowest_note[0] = 'C'
+
+    if highest_note[1] == 8:
+        if highest_note[0] != 'C': highest_note[0] = 'B'
+    else:
+        # upper octave index < 8 then draw a full scale
+        highest_note[0] = 'B'
+
+    # count the number of white key to adjust svg width
+    num_white_keys = len(whites_sub(lowest_note[0], 'B'))
+
+    for octv in range(lowest_note[1] + 1, highest_note[1]):
+        num_white_keys += 7
+
+    num_white_keys += len(whites_sub('C', highest_note[0]))
+
+    svg_content = ''
+    svg_chords = []
+    # index is used as an id for similary filenames
+    index = 0
+
+    # create svg content for each chords
+    for c in chords:
+
+        chord = c[0]
+        title = c[1]
+        h_kprint = c[2]
+
+        # create svg content from chord, title and h_kprint
+        svg_content = svg_open(title, h_kprint, num_white_keys)
+        svg_content += svg_draw_chord(chord,
+                                      title,
+                                      lowest_note,
+                                      highest_note,
+                                      num_white_keys)
+        svg_content += svg_close()
+
+        # create output filename from title
+        svg_filename = ''
+        if title and title != ' ':
+            svg_filename = fileprefix + title + '_' + '{:03d}'.format(index)
+        else:
+            svg_filename = fileprefix + '{:03d}'.format(index)
+
+        index += 1
+
+        # cleanup filename and set the correct extension
+        svg_filename = set_extension(sanitize(svg_filename), '.svg')
+
+        svg_chords.append([svg_content, svg_filename])
+
+    return svg_chords
 
 ###############################################
 # cleanup name to be OS compatible
@@ -575,10 +743,10 @@ def export_cmd_fullname(cmd):
     return ''
 
 ###############################################
-# return full shell svg to png command
+# return full shell svg-to-png like command
 # expression made out of EXPORT_CMD dictionary
 # content
-# return an empty string if none commands are
+# return an empty string if no commands are
 # found on the OS
 def export_cmd_expr():
     cmds = EXPORT_CMD.keys()
@@ -634,10 +802,9 @@ def musicxml_stream(root):
         # find all notes in the measure
         # ignore if no notes found
         notes = m.iter('note')
-        nb_notes = len(list(notes)) - 1
-        if nb_notes == 0: continue
+        if len(list(notes)) <= 1: continue
 
-        title = 'm ' + m.get('number')
+        title = 'm {:04d}'.format(int(m.get('number')))
         for n in m.iter('note'):
             # if a note is not marked as chord:
             #  increment chord_num
@@ -650,7 +817,7 @@ def musicxml_stream(root):
                     chord_num += 1
                     # transform the notes list in a string and add the title
                     # TODO: enhance this useless behaviour
-                    lines.append(' '.join(chord) + ';' + title + ' / chord ' + str(chord_num))
+                    lines.append(' '.join(chord) + ';' + title + ' / chord {:02d}'.format(chord_num))
                 chord = []
 
             p = n.find('pitch')
@@ -689,8 +856,8 @@ def simple_stream(file_data):
     return lines
 
 ###############################################
-# TODO: fix it ! Does not work with interactive input
 # read stream from standard input
+# TODO: fix it ! Does not work with interactive input
 def in_stream():
     # read standard input and store all data in a string
     # first try to transform the stream as an xml tree
@@ -717,48 +884,60 @@ def in_stream():
     return musicxml_stream(root)
 
 ###############################################
-# divide a given NoteOctave string into
-# ['note', octave] list
-# octave is optional
-# return None if note_string is None or not valid
-def split_note(note_string):
-    note_name = ''
-    octave = ''
-
-    # ignore empty notes
-    if note_string is None: return None
-
-    # separate note name and octave value
-    # octave is optional
-    if note_string[-1:] in '012345678':
-        # octave value found
-
-        # extract all but the last char
-        note_name = note_string[:-1].capitalize()
-        # extract the last char
-        octave = note_string[-1:]
-
-    else:
-        # no octave value found
-        note_name = note_string.capitalize()
-
-    # ignore unknown note
-    if note_name not in NOTES: raise NameError(note_name)
-
-    # return a couple of 2 elements
-    return note_name,octave
-
 ###############################################
 # extract notes from an string representing
 # a chord
-# 'A#4 Bbb4 C5' -> [('A#',4),('Bbb',4),('C',5)]
+# 'A#2 Bbb3 C5' -> [('A#',2),('Bbb',3),('C',5)]
+# 'A# Bbb C' -> [('A#',4),('Bbb',4),('C',5)]
 # 'T C A'       -> None
 def str_to_chord(chord_str):
     if chord_str == '': return None
 
+    octv = DEFAULT_OCTAVE
+    store_names = []
+
+    # divide a given NoteOctave string notation into
+    # ('note', octave) list
+    # octave is optional
+    # return None if note_string is None or not valid
+    def split_note(note_string):
+        note_name = ''
+        octave = ''
+
+        # ignore empty notes
+        if note_string is None: return None
+
+        # separate note name and octave value
+        # octave is optional
+        if note_string[-1:] in '0123456789':
+            # octave value found
+
+            # extract all but the last char
+            note_name = note_string[:-1].capitalize()
+            # extract the last char stored as number
+            octave = int(note_string[-1:])
+
+        else:
+            # no octave value found
+            note_name = note_string.capitalize()
+            octave = octv
+
+        # ignore unknown note
+        if note_name not in NOTES: raise NameError(note_name)
+
+        # return a couple of 2 elements
+        return [note_name,octave]
+
+
     note = []
     chord = []
     for n in chord_str.split():
+        # store the note name to increase
+        # octave number if note appear more
+        # than once
+        if n[:-1] in store_names:
+            octv += 1
+            store_names.append(n[:-1].capitalize())
         try:
             note = split_note(n)
         except NameError:
@@ -769,14 +948,45 @@ def str_to_chord(chord_str):
     return chord
 
 ###############################################
+# compare two notes and return the lowest
+# reminder: a note is ['name', octave_index]
+def lower_note(note_1, note_2):
+
+    if len(note_1) == 0 or len(note_2) == 0:
+        return []
+
+    if note_1[1] == '' or note_2[1] == '':
+        return []
+
+    # first compare octave
+    if note_1[1] < note_2[1]: return note_1
+    if note_2[1] < note_1[1]: return note_2
+
+    # same octave then compare note name index
+    if NOTES[note_1[0]] <= NOTES[note_2[0]]:
+        return note_1
+
+    return note_2
+
+###############################################
+# compare two notes and return the highest
+def higher_note(note_1, note_2):
+    if lower_note(note_1, note_2) == note_1: return note_2
+    return note_1
+
+###############################################
 # running actions when used interactively
 def build_chords():
     # all_chords stores a list of list of chords
     # each entry is [chord, title, svg_content, svg_filename]
-    all_chords = []
+    valid_chords = []
+    error_chords = []
 
     # chords is not empty if we reach this point
-    index = 0
+    first = True
+    lowest_note = []
+    highest_note = []
+
     for line in chords:
         chord = []
 
@@ -784,15 +994,39 @@ def build_chords():
         parts = line.split(';')
 
         # note names in a list, first letter uppercase
-        #chord = [note.capitalize() for note in chord.split()]
+        # in case of bad input, store an error in a dedicated list
+        # instead of the chord
         try:
-            chord = str_to_chord(parts[0])
+            chord = str_to_chord(str(parts[0]))
         except NameError as e:
-            all_chords.append(['', '', 
-                '"{}": bad input in "{}" (line ignored)'.format(str(e), str(chord))
-                ])
+            error_chords.append( 
+                '"{}": bad input in "{}" (line ignored)'.format(str(e), str(chord)))
             index += 1
             continue
+
+        # init bounds from the first chord
+        # lowerst_note and higher_notes are stored in order
+        # to calculate keyboard width
+        # notes must contain octave info to be used for comparision
+        if chord is not None:
+            if first is True:
+                # initialisation
+                tmp_note = lower_note(chord[0], chord[0])
+                if len(tmp_note) > 0: lowest_note = list(tmp_note)
+
+                # NOTE: chord[-1:] is a slice, i.e: [[]]
+                tmp_note = lower_note(chord[-1:][0], chord[-1:][0])
+                if len(tmp_note) > 0: highest_note = list(tmp_note)
+
+                if len(lowest_note) > 0 and len(highest_note) > 0:
+                    first = False
+            else:
+                tmp_note = lower_note(lowest_note, chord[0])
+                # note: list() is used to copy elements instead of object ref
+                if len(tmp_note) > 0: lowest_note = list(tmp_note)
+
+                tmp_note = higher_note(highest_note, chord[-1:][0])
+                if len(tmp_note) > 0: highest_note = list(tmp_note)
 
 
         # if chord empty then reset key print space below keyboard
@@ -808,25 +1042,9 @@ def build_chords():
             if title == r'\\':
                 title = ' '
 
-        # make output file name
-        if title and title != ' ':
-            svg_filename = fileprefix + title + '_' + str(index)
-        else:
-            svg_filename = fileprefix + str(index)
+        valid_chords.append([chord, title, h_kprint])
 
-        # cleanup filename and set the correct extension
-        svg_filename = set_extension(sanitize(svg_filename), '.svg')
-
-        svg_content = svg_open(title, h_kprint)
-        svg_content += svg_draw_chord(chord, title)
-        svg_content += svg_close()
-
-        all_chords.append([svg_content, svg_filename, ''])
-
-        # next chord
-        index += 1
-
-    return all_chords
+    return [valid_chords, error_chords, lowest_note, highest_note]
 
 ###############################################
 # write svg files
@@ -857,12 +1075,19 @@ if __name__ == '__main__':
     if not chords:
         chords = in_stream()
 
-    all_chords = build_chords()
+    [valid_chords, error_chords, lowest_note, highest_note] = build_chords()
 
-    svg_list = [entry[:2] for entry in all_chords if entry[0] != '']
+    # transform chord datas to svg drawings
+    if kbd88:
+        lowest_note = ['A', 0]
+        highest_note = ['C', 8]
+
+    svg_list = draw_chords(valid_chords, lowest_note, highest_note)
+
     svg_file(svg_list)
 
-    png_export(export, [entry[1] for entry in all_chords if entry[1] != ''])
-    report_error([entry[2] for entry in all_chords if entry[2] != ''])
+    png_export(export, svg_list)
+    report_error(error_chords)
 
     print('Done !\n' + str(len(svg_list)) + ' files created', file=sys.stdout)
+    sys.exit(0)
