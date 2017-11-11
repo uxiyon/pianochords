@@ -11,10 +11,13 @@
   - [ ] create a simple script (sc) to run showchord.py
 - [x] read chords from a musicxml partition
   - [x] accept octave information in a note name (ex. A#7 for A# on octave 7)
-    - [ ] write chords on a piano keyboard (88 keys)
-  - [ ] distinguish octave notes to write notes on the right keys
-- [ ] add version information
+    - [x] 0.7.2 write chords on a 88 keys piano keyboard with --piano option
+    - [x] 0.7.2 write chords on a 24 keys keyboard if no octave info is provided with notes
+    - [x] 0.7.2 write chords on an auto-sized keyboard if octave info is provided with notes
+  - [x] 0.7.2 distinguish octave notes to write notes on the right keys
+- [x] 0.7.2 add version information
+  - [ ] add --version option to print the current version
 - [ ] provide ascii output as a convenient fast feature
-- [ ] provide another way inputing chords: `--realname`, for instance `--realname "Cdim7"` for a C diminished seventh that is auto-calculated
+- [ ] provide another way to input chords: `--realname`, for instance `--realname "Cdim7"` for a C diminished seventh that is auto-calculated
 - [ ] provide a `--inversion` option to choose simple inversion (0,1,2,3) with `--realname` option: for instance `--inversion 0` for root position, `--inversion 2` for second inversion
 - [x] reorganize triad chords table in order to have only one note change from one to the other
