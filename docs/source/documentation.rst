@@ -16,6 +16,7 @@ The input is one or more lists of notes (forming a chord) and an optional title.
 ::
 
     showchord 'C E G' 'C E G;C major chord'
+    showchord 'C3 E3 G3' 'C5 E5 G5;C major chord'
 
 Refere to :ref:`examples-basic` for basic examples.
 
@@ -25,7 +26,7 @@ There are typically two ways to input chords.
 
 The format is ``N .. N;Chord title`` where ``N`` is a note, and ``Chord title`` is a string.
 
-A note is: 
+A note is:
 
 * a pitch step noted in german style, so it must be one of {A, B, C, D, E, F G}
 * followed by an optional *accidental*, one of {``#``, ``b``, ``x``, ``bb``}
@@ -61,7 +62,7 @@ A note is:
 
         cat chordlist.csv | showchord
 
-.. note:: It is possible to produce the picture of an empty 2 scales keyboard by providing an empty string as chord input (see the first basic example in :ref:`examples-basic`).
+.. note:: It is possible to produce the picture of an empty keyboard by providing an empty string as chord input (see the first basic example in :ref:`examples-basic`).
 
 
 
@@ -85,6 +86,23 @@ zoom
 
 The ``--zoom`` (short: ``-z``) option set the zoom factor of the output image. The value is a float number (e.g 2.45), but an integer is allowed (e.g 5)
 
+piano
+'''''
+
+The ``--piano`` (short ``-p``) option switches to the 88 piano keyboard size, from A0 to C8 keys.
+
+Without this option, two behaviour are possible:
+
+* if notes contain octave information, the keyboard is auto-sized with enough full scales to represent every chord of the given list
+* if notes **do not** contain octave information, then the lower octave is number 4 and upper octaves are created according to the provided notes.
+
+  * Redondant notes are represented on upper octave.
+
+    For example the serie ``'C D C'`` will be translated into ``'C4 D4 C5'``
+
+  * notes lower than previous ones in a serie will be set to the upper octave.
+
+    For example ``'E G# B D'`` will be translated into ``'E4 G#4 B4 D5'`` because ``D`` is lower than the other notes, and the order of the notes in a chord must be ordered from low to high.
 
 export
 ''''''

@@ -4,15 +4,16 @@ Features
 List
 ----
 
-* Draw an empty 2 octaves piano keyboard - eventually with a title - SVG output format
-* Draw any chord you can imagine (on a 2 octave keyboard) by giving note names. The chord is represented by round marks on the keys
-* Print a title above the keyboard, whether there chord notes are provided or not
+* Draw an empty 88 or 24 keys piano keyboard - eventually with a title - SVG output format
+* Draw any chord you can imagine (on a full sized keyboard) by giving note names. The chord is represented by round marks on the keys
+* Print a title above the keyboard, whether chord notes are provided or not
 * Print note names below the marked keys
 * Export to bitmap (PNG) file (by default, resulting is stored in SVG files)
 * Force output filename prefix
 * Provide zoom value to change the drawing size
-* Generate many chords at once from informations taken from a stream. 
-  Stream from musicxml file or simple specific csv-like file.
+* Generate many chords at once from informations taken from a stream.
+
+  * Stream from musicxml file or simple specific csv-like file.
 
 Motivation
 ----------

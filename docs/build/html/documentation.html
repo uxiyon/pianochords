@@ -104,6 +104,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#keyprint">keyprint</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#fileprefix">fileprefix</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#zoom">zoom</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#piano">piano</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#export">export</a></li>
 </ul>
 </li>
@@ -183,6 +184,7 @@
 <p>Showchord is a command line tool to produce piano chord representations.</p>
 <p>The input is one or more lists of notes (forming a chord) and an optional title. The separator between the note list and the title is the semicolon character: <code class="docutils literal"><span class="pre">;</span></code></p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">showchord</span> <span class="s1">&#39;C E G&#39;</span> <span class="s1">&#39;C E G;C major chord&#39;</span>
+<span class="n">showchord</span> <span class="s1">&#39;C3 E3 G3&#39;</span> <span class="s1">&#39;C5 E5 G5;C major chord&#39;</span>
 </pre></div>
 </div>
 <p>Refere to <a class="reference internal" href="examples.html#examples-basic"><span class="std std-ref">Basic</span></a> for basic examples.</p>
@@ -227,7 +229,7 @@
 </ul>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">It is possible to produce the picture of an empty 2 scales keyboard by providing an empty string as chord input (see the first basic example in <a class="reference internal" href="examples.html#examples-basic"><span class="std std-ref">Basic</span></a>).</p>
+<p class="last">It is possible to produce the picture of an empty keyboard by providing an empty string as chord input (see the first basic example in <a class="reference internal" href="examples.html#examples-basic"><span class="std std-ref">Basic</span></a>).</p>
 </div>
 </div>
 <div class="section" id="options">
@@ -243,6 +245,25 @@
 <div class="section" id="zoom">
 <h3>zoom<a class="headerlink" href="#zoom" title="Permalink to this headline">¶</a></h3>
 <p>The <code class="docutils literal"><span class="pre">--zoom</span></code> (short: <code class="docutils literal"><span class="pre">-z</span></code>) option set the zoom factor of the output image. The value is a float number (e.g 2.45), but an integer is allowed (e.g 5)</p>
+</div>
+<div class="section" id="piano">
+<h3>piano<a class="headerlink" href="#piano" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal"><span class="pre">--piano</span></code> (short <code class="docutils literal"><span class="pre">-p</span></code>) option switches to the 88 piano keyboard size, from A0 to C8 keys.</p>
+<p>Without this option, two behaviour are possible:</p>
+<ul>
+<li><p class="first">if notes contain octave information, the keyboard is auto-sized with enough full scales to represent every chord of the given list</p>
+</li>
+<li><p class="first">if notes <strong>do not</strong> contain octave information, then the lower octave is number 4 and upper octaves are created according to the provided notes.</p>
+<ul>
+<li><p class="first">Redondant notes are represented on upper octave.</p>
+<p>For example the serie <code class="docutils literal"><span class="pre">'C</span> <span class="pre">D</span> <span class="pre">C'</span></code> will be translated into <code class="docutils literal"><span class="pre">'C4</span> <span class="pre">D4</span> <span class="pre">C5'</span></code></p>
+</li>
+<li><p class="first">notes lower than previous ones in a serie will be set to the upper octave.</p>
+<p>For example <code class="docutils literal"><span class="pre">'E</span> <span class="pre">G#</span> <span class="pre">B</span> <span class="pre">D'</span></code> will be translated into <code class="docutils literal"><span class="pre">'E4</span> <span class="pre">G#4</span> <span class="pre">B4</span> <span class="pre">D5'</span></code> because <code class="docutils literal"><span class="pre">D</span></code> is lower than the other notes, and the order of the notes in a chord must be ordered from low to high.</p>
+</li>
+</ul>
+</li>
+</ul>
 </div>
 <div class="section" id="export">
 <h3>export<a class="headerlink" href="#export" title="Permalink to this headline">¶</a></h3>
@@ -297,7 +318,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.6.1',
+            VERSION:'0.7.2',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,

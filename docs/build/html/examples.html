@@ -106,6 +106,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#chord-title">Chord title</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#notes-name">Notes name</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#zoom">Zoom</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#piano">Piano</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#stream-input">Stream input</a></li>
 </ul>
 </li>
@@ -255,6 +256,20 @@
 <p><code class="docutils literal"><span class="pre">--zoom</span> <span class="pre">2.96</span></code>: <a class="reference external" href="_static/examples/zm_2.96_Ab_7_0.svg"><img alt="zm_2.96_Ab_7_0.svg" src="_images/zm_2.96_Ab_7_0.svg" /></a></p>
 <p><code class="docutils literal"><span class="pre">--zoom</span> <span class="pre">4.0</span></code>: <a class="reference external" href="_static/examples/zm_4_Ab_7_0.svg"><img alt="zm_4_Ab_7_0.svg" src="_images/zm_4_Ab_7_0.svg" /></a></p>
 </div>
+<div class="section" id="piano">
+<h2>Piano<a class="headerlink" href="#piano" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal"><span class="pre">--piano</span></code> (<code class="docutils literal"><span class="pre">-p</span></code>) switches the piano mode on to show chords on a real 88 keys piano keyboard. Here is an example of use to generate an empty keyboard.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">showchord</span> <span class="s1">&#39;;88 keys piano keyboard&#39;</span> <span class="o">-</span><span class="n">z</span> <span class="mf">1.5</span> <span class="o">--</span><span class="n">piano</span>
+</pre></div>
+</div>
+<p>The previous command generates the following SVG image:</p>
+<p><a class="reference external" href="_static/examples/chord_88_keys_piano_keyboard_000.svg"><img alt="kbd88.svg" src="_images/chord_88_keys_piano_keyboard_000.svg" /></a></p>
+<p>This provide a way to right very complex chords:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">showchord</span> <span class="o">-</span><span class="n">f</span> <span class="s1">&#39;_&#39;</span> <span class="o">-</span><span class="n">z</span> <span class="mf">1.5</span> <span class="o">--</span><span class="n">piano</span> <span class="s1">&#39;C1 C2 A2 E3 G3 D4 G4 C5 F5 A5 D6;Very acrobatic chord&#39;</span>
+</pre></div>
+</div>
+<p><a class="reference external" href="_static/examples/_Very_acrobatic_chord_000.svg"><img alt="acrobatic_chord" src="_images/_Very_acrobatic_chord_000.svg" /></a></p>
+</div>
 <div class="section" id="stream-input">
 <h2>Stream input<a class="headerlink" href="#stream-input" title="Permalink to this headline">¶</a></h2>
 <p>Stream input is the natural mode for providing chords. You can provide as many chords as you like in a single call. However, you may want to prepare many chords in a text file and draw them at once. You can use system redirection to achieve this.</p>
@@ -337,7 +352,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.6.1',
+            VERSION:'0.7.2',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,
