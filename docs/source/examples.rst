@@ -40,6 +40,7 @@ The result is the SVG file chord_0.svg_: |chord_0.svg|
 
 .. |chord_0.svg| image:: _static/examples/chord_0.svg
 
+
 Another more common basic usage is with a chord description:
 
 ::
@@ -157,6 +158,34 @@ The result images are the following:
 ``--zoom 2.96``: |zm_2.96_Ab_7_0.svg|
 
 ``--zoom 4.0``: |zm_4_Ab_7_0.svg|
+
+Piano
+-----
+
+The ``--piano`` (``-p``) switches the piano mode on to show chords on a real 88 keys piano keyboard. Here is an example of use to generate an empty keyboard.
+
+::
+
+    showchord ';88 keys piano keyboard' -z 1.5 --piano
+
+.. |kbd88.svg| image:: _static/examples/chord_88_keys_piano_keyboard_000.svg
+               :target: _static/examples/chord_88_keys_piano_keyboard_000.svg
+
+The previous command generates the following SVG image:
+
+|kbd88.svg|
+
+This provide a way to right very complex chords:
+
+::
+
+    showchord -f '_' -z 1.5 --piano 'C1 C2 A2 E3 G3 D4 G4 C5 F5 A5 D6;Very acrobatic chord'
+
+.. |acrobatic_chord| image:: _static/examples/_Very_acrobatic_chord_000.svg
+                     :target: _static/examples/_Very_acrobatic_chord_000.svg
+
+|acrobatic_chord|
+
 
 Stream input
 ------------
