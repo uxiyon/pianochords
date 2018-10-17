@@ -5,7 +5,7 @@
 
 Released under GNU GENERAL PUBLIC LICENSE, Version 3, 29 June 2007
 
-Given a sequence of music notes, draw a piano keyboard
+Given a sequence of music notes, draw a piano keyboard 
 with marks on the corresponding keys
 
 The note sequence must be from low to high (left to right)
@@ -13,7 +13,7 @@ The chord name may be provided to be printed above the keyboard
 Note names may be printed below the keyboard
 
 Synopsis:
-showchord [-h] [--keyprint] [--fileprefix FILEPREFIX] [--export]
+showchord [-h] [--keyprint] [--fileprefix FILEPREFIX] [--export] 
                  [--zoom ZOOM] ['C E G B;Cmaj7' '' 'a c# e g#;Amaj7']
 
 Three examples giving the same result:
@@ -43,7 +43,7 @@ $ showchord -e -k -z 3
 if no chord is given, then switches to stream mode and waits for 
 input from stdin
 
-NOTE: chords as arguments override any stream input, i.e: stream
+NOTE: chords as arguments override any stream input, i.e: stream 
 input is switched on only if no chord is provided as arguments
 
 requirements:
@@ -167,15 +167,15 @@ NOTES = {'Cbb' : 10,
 '''Note in an octave
    a note is a couple of the form ['note_name', octave]
    note_name is used to name the note and to 
-   place it in a single scale via the index found in NOTES
-   octave is used to tell witch scale to address,
+   place it in a single scale via the index found in NOTES 
+   octave is used to tell witch scale to address, 
    from 0 (lowest A) to 8 (highest C) on an 88 piano keyboard'''
 note = []
 
-'''list of chords of the forme 'N N N N;Title'
-   where N is a note ['note_name', octave]
+'''list of chords of the forme 'N N N N;Title' 
+   where N is a note ['note_name', octave] 
    and title is a string
-   chords data are provided via command line arguments or
+   chords data are provided via command line arguments or 
    via input stream'''
 chords = []
 
@@ -236,8 +236,11 @@ NOTES_REPR.append([6, 0, white, 11])	# 11 : B
 ###############################################
 
 ###############################################
-# command line arguments
 def args():
+    '''
+    command line arguments
+    '''
+
     global chords
     global keyprint
     global height_keyprint
@@ -333,8 +336,11 @@ Show chord notes on a piano keyboard, output each chord on a SVG image
     kbd88 = args.piano
 
 ###############################################
-# print begining of svg file
 def svg_open(title, height_kprint, num_white_keys):
+    '''
+    print begining of svg file
+    '''
+
     svg_header = '''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
@@ -379,8 +385,11 @@ def svg_open(title, height_kprint, num_white_keys):
                              height)
 
 ###############################################
-# print svg group open
 def svg_g_open(title, num_white_keys):
+    '''
+    print svg group open
+    '''
+
     ret = ''
     x_translate = 1
     y_translate = 1
@@ -397,18 +406,26 @@ def svg_g_open(title, num_white_keys):
                                   title)
 
 ###############################################
-# print svg group end
 def svg_g_close():
+    '''
+    print svg group end
+    '''
+
     return '</g>'
 
 ###############################################
-# print svg file end
 def svg_close():
+    '''
+    print svg file end
+    '''
+
     return '</svg>'
 
 ###############################################
-# draw the given key as svg rectangle
 def svg_draw_key(octave_shift, notename, color, v_shift):
+    '''
+    draw the given key as svg rectangle
+    '''
 
     # retrieve key structure from notename
     key = NOTES_REPR[NOTES[notename]]
@@ -435,8 +452,10 @@ def svg_draw_key(octave_shift, notename, color, v_shift):
                           COLOR)
 
 ##############################################
-# draw a mark on the given note as svg circle
 def svg_draw_mark(octave_shift, notename):
+    '''
+    draw a mark on the given note as svg circle
+    '''
 
     # retrieve key structure from notename
     key = NOTES_REPR[NOTES[notename]]
@@ -460,8 +479,10 @@ def svg_draw_mark(octave_shift, notename):
 
 ###############################################
 def svg_draw_keyname(octave_shift, notename):
+    '''
+    retrieve key structure from notename
+    '''
 
-    # retrieve key structure from notename
     key = NOTES_REPR[NOTES[notename]]
 
     font_size = 0.5 * zoom
@@ -487,8 +508,11 @@ def svg_draw_keyname(octave_shift, notename):
                           notename)
 
 ###############################################
-# draw chord name as svg text
 def svg_draw_title(title, num_white_keys):
+    '''
+    draw chord name as svg text
+    '''
+
     y = 14 * zoom
     x = ((num_white_keys * WTE_WIDTH - (len(title) * 8)) / 2) * zoom
     font_size = 0.8 * zoom
@@ -511,13 +535,15 @@ def svg_draw_title(title, num_white_keys):
 
 
 ###############################################
-# extract key lists from a full scale
-# for drawing purpose
 def whites():
     '''
+    extract key lists from a full scale
+    for drawing purpose
+
     return white keys list from n_min to n_max
     keys are white if there name does not contain #
     '''
+
     return [note for note in KEYS if note[-1:] != '#']
 
 def whites_sub(nte_min, nte_max):
@@ -525,30 +551,36 @@ def whites_sub(nte_min, nte_max):
     return white keys list from n_min to n_max
     keys are white if there name does not contain #
     '''
+
     return [note for note in KEYS if note[-1:] != '#'
         and KEYS.index(note) >= KEYS.index(nte_min)
         and KEYS.index(note) <= KEYS.index(nte_max)]
 
 def blacks():
     '''
-    return white keys list from n_min to n_max
-    keys are white if there name does not contain #
+    return black keys list from n_min to n_max
+    keys are black if there name contains #
     '''
+
     return [note for note in KEYS if note[-1:] == '#']
 
 def blacks_sub(nte_min, nte_max):
     '''
-    return white keys list from n_min to n_max
-    keys are white if there name does not contain #
+    return black keys list from n_min to n_max
+    keys are black if there name contains #
     '''
+
     return [note for note in KEYS if note[-1:] == '#'
         and KEYS.index(note) >= KEYS.index(nte_min)
         and KEYS.index(note) <= KEYS.index(nte_max)]
 
 ###############################################
-# draw a whole set of keys of a certain octave
-# return the corresponding svg code
 def draw_keys(octv_shift, keys, color, v_shift):
+    '''
+    draw a whole set of keys of a certain octave
+    return the corresponding svg code
+    '''
+
     kbd_part = ''
     for note in keys:
         kbd_part += svg_draw_key(octv_shift, note, color, v_shift)
@@ -556,8 +588,11 @@ def draw_keys(octv_shift, keys, color, v_shift):
     return kbd_part
 
 ###############################################
-# draw a keyboard of arbitrary size
 def draw_svg_kbd(note_min, octave_min, note_max, octave_max):
+    '''
+    draw a keyboard of arbitrary size
+    '''
+
     kbd = ''
 
     OCTV_MIN = octave_min + 1
@@ -597,6 +632,9 @@ def draw_svg_kbd(note_min, octave_min, note_max, octave_max):
 
 ###############################################
 def svg_draw_chord(chord, title, lowest_note, highest_note, num_white_keys):
+    '''
+    draw a chord in svg format
+    '''
 
     svg_chord = svg_g_open(title, num_white_keys)
 
@@ -638,11 +676,12 @@ def svg_draw_chord(chord, title, lowest_note, highest_note, num_white_keys):
     return svg_chord
 
 ###############################################
-# draw all chords
-# chords: [chord, title, h_kprint]
 def draw_chords(chords, lowest_note, highest_note):
+    '''
+    draw all chords
+    chords: [chord, title, h_kprint]    if len(lowest_note) == 0: lowest_note = ['C', 4]
+    '''
 
-    if len(lowest_note) == 0: lowest_note = ['C', 4]
     if len(highest_note) == 0: highest_note = ['B', 5]
 
     # if bounds are not of an 88 piano keyboard
@@ -704,8 +743,11 @@ def draw_chords(chords, lowest_note, highest_note):
     return svg_chords
 
 ###############################################
-# cleanup name to be OS compatible
 def sanitize(name):
+    '''
+    cleanup name to be OS compatible
+    '''
+
     tmp = name.replace("_ ", "_")
     tmp = tmp.replace(" ", "_")
     tmp = tmp.replace("#","s")
@@ -715,9 +757,12 @@ def sanitize(name):
     return tmp
 
 ###############################################
-# add or replace filename extension
-# return name with the given extension
 def set_extension(name, ext):
+    '''
+    add or replace filename extension
+    return name with the given extension
+    '''
+
     if name == '':
         return name
 
@@ -733,22 +778,28 @@ def set_extension(name, ext):
 
 
 ###############################################
-# check if external cmd exists and is executable on OS
-# return command full name on success
-# or empty string on failed search
 def export_cmd_fullname(cmd):
+    '''
+    check if external cmd exists and is executable on OS
+    return command full name on success
+    or empty string on failed search
+    '''
+
     for path in os.environ["PATH"].split(os.pathsep):
         if os.access(os.path.join(path, cmd), os.X_OK):
             return os.path.join(path, cmd)
     return ''
 
 ###############################################
-# return full shell svg-to-png like command
-# expression made out of EXPORT_CMD dictionary
-# content
-# return an empty string if no commands are
-# found on the OS
 def export_cmd_expr():
+    '''
+    return full shell svg-to-png like command
+    expression made out of EXPORT_CMD dictionary
+    content
+    return an empty string if no commands are
+    found on the OS
+    '''
+
     cmds = EXPORT_CMD.keys()
     cmds.sort()
     for cmd in cmds:
@@ -760,8 +811,10 @@ def export_cmd_expr():
     return ''
 
 ###############################################
-# export to PNG
 def png_export(export, files):
+    '''
+    export to PNG
+    '''
 
     # only export if export == True
     if not export: return None
@@ -782,8 +835,11 @@ def png_export(export, files):
               file=sys.stderr)
 
 ###############################################
-# read chords from a musicxml stream
 def musicxml_stream(root):
+    '''
+    read chords from a musicxml stream
+    '''
+
     chord = []
     lines = []
 
@@ -832,12 +888,15 @@ def musicxml_stream(root):
 
 
 ###############################################
-# read chords from csv-like format
 def simple_stream(file_data):
-    # draw one chord for each line.
-    # line should be of the following form:
-    # C E G;C major
-    # i.e: 2 parts: chord;title
+    '''
+    read chords from csv-like format
+    draw one chord for each line.
+    line should be of the following form:
+    C E G;C major
+    i.e: 2 parts: chord;title
+    '''
+
     lines = []
     data = file_data.split('\n')
     try:
@@ -856,13 +915,15 @@ def simple_stream(file_data):
     return lines
 
 ###############################################
-# read stream from standard input
 # TODO: fix it ! Does not work with interactive input
 def in_stream():
-    # read standard input and store all data in a string
-    # first try to transform the stream as an xml tree
-    # if it fails with another exception than KeyboardInterrupt
-    # then try to load basic specific showchord format
+    '''
+    read stream from standard input
+    read standard input and store all data in a string
+    first try to transform the stream as an xml tree
+    if it fails with another exception than KeyboardInterrupt
+    then try to load basic specific showchord format
+    '''
 
     file_data = sys.stdin.read()
     simple = False
@@ -884,13 +945,15 @@ def in_stream():
     return musicxml_stream(root)
 
 ###############################################
-###############################################
-# extract notes from an string representing
-# a chord
-# 'A#2 Bbb3 C5' -> [('A#',2),('Bbb',3),('C',5)]
-# 'A# Bbb C' -> [('A#',4),('Bbb',4),('C',5)]
-# 'T C A'       -> None
 def str_to_chord(chord_str):
+    '''
+    extract notes from an string representing
+    a chord
+    'A#2 Bbb3 C5' -> [('A#',2),('Bbb',3),('C',5)]
+    'A# Bbb C' -> [('A#',4),('Bbb',4),('C',5)]
+    'T C A'       -> None
+    '''
+
     if chord_str == '': return None
 
     octv = DEFAULT_OCTAVE
@@ -948,9 +1011,11 @@ def str_to_chord(chord_str):
     return chord
 
 ###############################################
-# compare two notes and return the lowest
-# reminder: a note is ['name', octave_index]
 def lower_note(note_1, note_2):
+    '''
+    compare two notes and return the lowest
+    reminder: a note is ['name', octave_index]
+    '''
 
     if len(note_1) == 0 or len(note_2) == 0:
         return []
@@ -969,16 +1034,21 @@ def lower_note(note_1, note_2):
     return note_2
 
 ###############################################
-# compare two notes and return the highest
 def higher_note(note_1, note_2):
+    '''
+    compare two notes and return the highest
+    '''
     if lower_note(note_1, note_2) == note_1: return note_2
     return note_1
 
 ###############################################
-# running actions when used interactively
 def build_chords():
-    # all_chords stores a list of list of chords
-    # each entry is [chord, title, svg_content, svg_filename]
+    '''
+    running actions when used interactively
+    all_chords stores a list of list of chords
+    each entry is [chord, title, svg_content, svg_filename]
+    '''
+
     valid_chords = []
     error_chords = []
 
@@ -1047,15 +1117,21 @@ def build_chords():
     return [valid_chords, error_chords, lowest_note, highest_note]
 
 ###############################################
-# write svg files
 def svg_file(all_chords):
+    '''
+    write svg files
+    '''
+
     for chord_entry in all_chords:
         with open(chord_entry[1], 'w') as svg_file:
             print(chord_entry[0], file=svg_file)
 
 ###############################################
-# report errors if present
 def report_error(errors):
+    '''
+    report errors if present
+    '''
+
     if errors: print('Error encountered:')
     for e in errors:
         print(e, file=sys.stderr)
@@ -1091,3 +1167,4 @@ if __name__ == '__main__':
 
     print('Done !\n' + str(len(svg_list)) + ' files created', file=sys.stdout)
     sys.exit(0)
+
