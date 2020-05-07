@@ -17,6 +17,13 @@
   - [x] 0.7.2 distinguish octave notes to write notes on the right keys
 - [x] 0.7.2 add version information
   - [ ] add --version option to print the current version
+- [ ] 0.7.3 improve keyboard aesthetic
+  - [x] 0.7.3 fix black key shift depending on their position on keyboard
+  - [x] 0.7.3 set the right piano key dimensions and proportions
+  - [x] 0.7.3 print keynames on keys instead of under the keyboard
+  - [x] 0.7.3 curve key angles
+  - [ ] 0.7.3 add a red key bushing cloth
+  - [ ] 0.7.3 add visual effects on black keys to simulate light reflects
 - [ ] provide ascii output as a convenient fast feature
 - [ ] provide another way to input chords: `--realname`, for instance `--realname "Cdim7"` for a C diminished seventh that is auto-calculated
 - [ ] provide a `--inversion` option to choose simple inversion (0,1,2,3) with `--realname` option: for instance `--inversion 0` for root position, `--inversion 2` for second inversion
